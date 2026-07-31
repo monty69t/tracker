@@ -5,188 +5,1132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pulse 1one — контроль времени</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg1:#FDF3EA; --bg2:#F1E8FB; --bg3:#E4F3FF;
-    --surface:#FFFFFF;
-    --ink:#2B2140;
-    --muted:#7A7190;
-    --border:#EAE2F5;
-    --study:#7C5CFF; --study-l:#efeaff;
-    --work:#FF9F43;  --work-l:#fff2e2;
-    --training:#12C48B; --training-l:#e2faf3;
-    --personal:#FF5D8F; --personal-l:#ffe7ee;
-    --pulse:#FF5D8F;
-    --radius:20px;
+  /* ===== RESET & BASE ===== */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    color:var(--ink);
-    font-family:'IBM Plex Sans',sans-serif;
-    -webkit-font-smoothing:antialiased;
-    background:
-      radial-gradient(720px 480px at 8% -8%, var(--personal-l) 0%, transparent 60%),
-      radial-gradient(760px 520px at 105% 8%, var(--study-l) 0%, transparent 55%),
-      radial-gradient(680px 460px at 50% 115%, var(--training-l) 0%, transparent 55%),
-      linear-gradient(160deg, var(--bg1), var(--bg2) 55%, var(--bg3));
-    background-attachment:fixed;
-    min-height:100vh;
-  }
-  h1,h2,h3,.disp{font-family:'Fredoka',sans-serif;}
-  #app{max-width:940px;margin:0 auto;padding:26px 20px 70px;}
-
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-  @keyframes pulseGood{0%{background:rgba(18,196,139,.16);}100%{background:transparent;}}
-  @keyframes ribbonGrow{from{opacity:0;transform:scaleX(.85);}to{opacity:1;transform:scaleX(1);}}
-  @keyframes pulseGlow{
-    0%,100%{box-shadow:0 0 0 0 rgba(255,93,143,.4);}
-    50%{box-shadow:0 0 0 8px rgba(255,93,143,0);}
+  
+  :root {
+    --bg: #F8F7FA;
+    --surface: #FFFFFF;
+    --ink: #1A1625;
+    --muted: #78738A;
+    --border: #EDEBF2;
+    --study: #6C5CE7;
+    --study-l: #F0EDFF;
+    --work: #F39C12;
+    --work-l: #FFF8EE;
+    --training: #00B894;
+    --training-l: #E6F9F3;
+    --personal: #E17055;
+    --personal-l: #FDF0ED;
+    --pulse: #6C5CE7;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(26,22,37,0.06), 0 4px 12px rgba(26,22,37,0.04);
+    --shadow-hover: 0 4px 16px rgba(26,22,37,0.08);
   }
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;animation:fadeInUp .35s ease both;}
-  .brand{display:flex;align-items:center;gap:12px;}
-  .brand .mark{font-size:30px;line-height:1;filter:drop-shadow(0 2px 4px rgba(255,93,143,.25));}
-  .brand .disp{font-size:23px;font-weight:700;letter-spacing:-0.01em;background:linear-gradient(135deg, var(--pulse), var(--study));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .brand .sub{color:var(--muted);font-size:12.5px;margin-top:2px;}
-
-  .viewtoggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;box-shadow:0 2px 10px rgba(124,92,255,.08);}
-  .viewtoggle button{border:none;background:transparent;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Fredoka',sans-serif;transition:.18s;}
-  .viewtoggle button.active{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;box-shadow:0 3px 10px rgba(255,93,143,.35);}
-  .viewtoggle button:not(.active):hover{color:var(--ink);}
-
-  .code-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:18px;animation:fadeInUp .3s ease both;}
-  .code-bar .lbl{font-size:12px;color:var(--muted);}
-  .code-pill{font-family:'Fredoka',sans-serif;font-weight:700;letter-spacing:.08em;background:linear-gradient(135deg,var(--study-l),var(--personal-l));color:var(--ink);padding:5px 12px;border-radius:8px;font-size:14.5px;}
-  .code-bar button{border:1px solid var(--border);background:#FBFAFE;padding:6px 12px;border-radius:9px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s;}
-  .code-bar button:hover{border-color:var(--study);color:var(--study);}
-  .code-bar .spacer{flex:1;}
-
-  .nav{display:flex;align-items:center;gap:10px;margin-bottom:18px;animation:fadeInUp .4s ease both;}
-  .nav button{border:1px solid var(--border);background:var(--surface);width:34px;height:34px;border-radius:12px;cursor:pointer;font-size:16px;color:var(--ink);transition:.15s;}
-  .nav button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(124,92,255,.15);border-color:#DCCFF5;}
-  .nav .label{font-weight:600;font-size:14.5px;min-width:170px;text-align:center;font-family:'Fredoka',sans-serif;}
-  .nav .today{border-radius:12px;padding:0 14px;width:auto;font-size:12px;font-weight:600;background:var(--surface);}
-
-  button:focus-visible, input:focus-visible, select:focus-visible, .daycell:focus-visible{
-    outline:2px solid var(--study);outline-offset:2px;
+  html, body {
+    height: 100%;
   }
 
-  .balance-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;box-shadow:0 6px 24px rgba(124,92,255,.08);animation:fadeInUp .3s ease both;}
-  .balance-card .btitle{font-size:13.5px;color:var(--muted);margin-bottom:12px;font-weight:600;font-family:'Fredoka',sans-serif;}
-  .ribbon{display:flex;height:16px;border-radius:999px;overflow:hidden;background:#F2EEFA;transform-origin:left;animation:ribbonGrow .5s ease both;}
-  .ribbon > span{height:100%;transition:width .4s ease;}
-  .ribbon.empty{background:repeating-linear-gradient(45deg,#F2EEFA,#F2EEFA 7px,#E9E2F7 7px,#E9E2F7 14px);}
-  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;}
-  .legend .item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);}
-  .legend .dot{width:10px;height:10px;border-radius:4px;flex-shrink:0;}
-  .legend .pct{font-weight:700;color:var(--ink);}
-  .empty-note{font-size:12.5px;color:var(--muted);margin-top:12px;}
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--bg);
+    min-height: 100vh;
+  }
 
-  .weekday-row{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:7px;}
-  .weekday-row div{text-align:center;font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
-  .month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:20px;}
-  .daycell{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:9px 7px;min-height:68px;cursor:pointer;text-align:left;font-family:inherit;display:flex;flex-direction:column;gap:6px;position:relative;transition:.15s;}
-  .daycell:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(124,92,255,.14);}
-  .daycell.other{opacity:.35;}
-  .daycell.today{border-color:var(--study);}
-  .daycell.selected{background:linear-gradient(135deg,var(--ink),#3d2f5c);border-color:transparent;}
-  .daycell.selected .daynum, .daycell.selected .count{color:#fff;}
-  .daynum{font-size:13px;font-weight:700;font-family:'Fredoka',sans-serif;}
-  .count{font-size:10px;color:var(--muted);}
-  .mini-ribbon{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#F2EEFA;margin-top:auto;}
-  .mini-ribbon>span{height:100%;}
+  #app {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 24px 24px 60px;
+  }
 
-  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-bottom:20px;}
-  .week-col{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 9px;cursor:pointer;display:flex;flex-direction:column;gap:9px;min-height:155px;font-family:inherit;text-align:left;transition:.15s;}
-  .week-col:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(124,92,255,.14);}
-  .week-col.today{border-color:var(--study);}
-  .week-col.selected{background:linear-gradient(160deg,var(--ink),#3d2f5c);border-color:transparent;}
-  .week-col.selected .wd-name,.week-col.selected .wd-num,.week-col.selected .chip{color:#fff;}
-  .wd-name{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-weight:600;}
-  .wd-num{font-size:17px;font-weight:700;font-family:'Fredoka',sans-serif;}
-  .week-col .mini-ribbon{margin-top:0;}
-  .chip-list{display:flex;flex-direction:column;gap:5px;}
-  .chip{font-size:11px;padding:4px 7px;border-radius:8px;background:#F5F1FB;color:var(--ink);display:flex;align-items:center;gap:5px;line-height:1.3;}
-  .week-col.selected .chip{background:rgba(255,255,255,.14);}
-  .chip .sq{width:6px;height:6px;border-radius:2px;flex-shrink:0;}
-  .chip.done{opacity:.5;text-decoration:line-through;}
-  .chip-more{font-size:10.5px;color:var(--muted);}
-  .week-col.selected .chip-more{color:rgba(255,255,255,.7);}
-  .chip-template{background:rgba(255,93,143,.12);border:1px dashed var(--pulse);}
-  .week-col.selected .chip-template{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);}
-  .chip-template-icon{font-size:10px;}
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:0 6px 24px rgba(124,92,255,.08);animation:fadeInUp .3s ease both;}
-  .panel h2{font-size:17px;margin:0 0 14px;}
-  .task-row{display:flex;align-items:center;gap:11px;padding:10px 6px;border-bottom:1px solid var(--border);border-radius:10px;transition:.15s;}
-  .task-row:last-of-type{border-bottom:none;}
-  .task-row.just-done{animation:pulseGood .6s ease;}
-  .task-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--training);flex-shrink:0;cursor:pointer;}
-  .task-cat{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
-  .task-title{flex:1;font-size:14px;}
-  .task-title.done{text-decoration:line-through;color:var(--muted);}
-  .task-time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
-  .task-cat-label{font-size:15px;}
-  .del-btn{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;padding:4px 6px;border-radius:8px;transition:.15s;}
-  .del-btn:hover{color:#e0447a;background:var(--personal-l);}
-  .empty-day{color:var(--muted);font-size:13.5px;padding:8px 0 16px;}
-  .template-badge{font-size:10px;background:var(--pulse);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px;}
+  @keyframes ribbonGrow {
+    from {
+      opacity: 0;
+      transform: scaleX(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
 
-  .add-form{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);align-items:center;}
-  .add-form input[type=text]{flex:1 1 200px;padding:10px 13px;border:1px solid var(--border);border-radius:11px;font-size:14px;font-family:inherit;background:#FBFAFE;}
-  .add-form select{padding:10px 11px;border:1px solid var(--border);border-radius:11px;font-size:13px;font-family:inherit;background:#FBFAFE;color:var(--ink);}
-  .add-form .time-field{display:flex;align-items:center;gap:5px;}
-  .add-form .time-field label{font-size:11px;color:var(--muted);}
-  .add-form input[type=time]{padding:10px 11px;border:1px solid var(--border);border-radius:11px;font-size:13px;font-family:inherit;background:#FBFAFE;}
-  .add-form input:focus, .add-form select:focus{border-color:var(--study);}
-  .add-form button{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;border:none;padding:10px 20px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Fredoka',sans-serif;transition:.15s;box-shadow:0 4px 14px rgba(255,93,143,.3);}
-  .add-form button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,93,143,.4);}
-  .add-form button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
-  .hint{font-size:11.5px;color:var(--muted);width:100%;margin-top:-2px;}
+  /* ===== LOGO ===== */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
-  .loading{text-align:center;color:var(--muted);padding:60px 0;font-size:14px;}
+  .logo-icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  .toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:60;display:flex;align-items:center;gap:8px;max-width:80vw;}
-  .toast.show{opacity:1;transform:translateY(0);}
-  .toast.err{background:#c0392b;}
+  .logo-icon svg {
+    width: 40px;
+    height: 40px;
+  }
 
-  .overlay{position:fixed;inset:0;background:rgba(43,33,64,.45);display:flex;align-items:center;justify-content:center;z-index:70;padding:20px;}
-  .overlay[hidden]{display:none;}
-  .modal{background:var(--surface);border-radius:18px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:fadeInUp .2s ease both;max-height:90vh;overflow-y:auto;}
-  .modal h3{margin:0 0 6px;font-size:17px;}
-  .modal p{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.5;}
-  .modal input{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:'Fredoka',sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
-  .modal .row{display:flex;gap:8px;}
-  .modal button{flex:1;padding:10px;border-radius:10px;border:none;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Fredoka',sans-serif;}
-  .modal .go{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;}
-  .modal .cancel{background:#F1EEF7;color:var(--ink);}
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
 
-  .setup-banner{background:#fff7e6;border:1px solid #f2d98a;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:13px;line-height:1.6;color:#6b5d1f;}
-  .setup-banner code{background:#fdeecb;padding:1px 6px;border-radius:5px;font-size:12px;}
+  .logo-name {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
 
-  .templates-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
-  .templates-section h3{font-size:14px;margin:0 0 10px;color:var(--muted);font-family:'Fredoka',sans-serif;}
-  .template-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#FBFAFE;border-radius:10px;margin-bottom:6px;border:1px solid var(--border);}
-  .template-item .days{font-size:11px;color:var(--muted);}
-  .template-item .del-tpl{border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px;}
-  .template-item .del-tpl:hover{color:#e0447a;}
-  .add-template-btn{background:var(--surface);border:1px dashed var(--border);border-radius:10px;padding:10px;width:100%;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;transition:.15s;}
-  .add-template-btn:hover{border-color:var(--pulse);color:var(--pulse);}
+  .logo-name span {
+    color: var(--pulse);
+  }
 
-  .weekday-checkboxes{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
-  .weekday-checkboxes label{display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid var(--border);background:#FBFAFE;}
-  .weekday-checkboxes label.active{background:var(--study-l);border-color:var(--study);}
-  .weekday-checkboxes input[type=checkbox]{accent-color:var(--study);}
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
 
-  @media(max-width:680px){
-    .week-grid{grid-template-columns:1fr;}
-    .week-col{min-height:auto;}
-    .month-grid{gap:4px;}
-    .daycell{min-height:52px;padding:6px 4px;}
-    .nav .label{min-width:auto;}
+  /* ===== UTILITY ===== */
+  .flex {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ===== TOPBAR ===== */
+  .topbar {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  /* ===== VIEW TOGGLE ===== */
+  .viewtoggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .viewtoggle button {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+  }
+
+  .viewtoggle button.active {
+    background: var(--pulse);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.25);
+  }
+
+  .viewtoggle button:not(.active):hover {
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+  /* ===== CODE BAR ===== */
+  .code-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+  }
+
+  .code-bar .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .code-pill {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .code-bar button {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.15s;
+  }
+
+  .code-bar button:hover {
+    border-color: var(--pulse);
+    color: var(--pulse);
+  }
+
+  .code-bar .spacer {
+    flex: 1;
+  }
+
+  .code-bar .status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .code-bar .status.online {
+    background: #00B894;
+  }
+
+  .code-bar .status.offline {
+    background: #E17055;
+  }
+
+  /* ===== NAV ===== */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .nav button {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--ink);
+    transition: 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav button:hover {
+    background: var(--bg);
+    border-color: var(--pulse);
+  }
+
+  .nav .label {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 180px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav .today {
+    border-radius: 8px;
+    padding: 0 16px;
+    width: auto;
+    height: 32px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface);
+  }
+
+  /* ===== FOCUS ===== */
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--pulse);
+    outline-offset: 2px;
+  }
+
+  /* ===== DAY SCHEDULE ===== */
+  .day-schedule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .day-schedule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .day-schedule-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .day-schedule-header .date {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    font-size: 13px;
+  }
+
+  .schedule-grid .time {
+    color: var(--muted);
+    font-weight: 500;
+    padding: 4px 0;
+  }
+
+  .schedule-grid .task {
+    color: var(--ink);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .schedule-grid .task .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .schedule-grid .task.done {
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+
+  .schedule-empty {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 4px 0;
+  }
+
+  /* ===== BALANCE ===== */
+  .balance-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .balance-card .btitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .ribbon {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #F0EEF5;
+    transform-origin: left;
+    animation: ribbonGrow 0.5s ease both;
+  }
+
+  .ribbon > span {
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+
+  .ribbon.empty {
+    background: #F0EEF5;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  .legend .item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .legend .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .legend .pct {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .empty-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  /* ===== CALENDAR WEEK ===== */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .week-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 150px;
+    font-family: inherit;
+    text-align: left;
+    transition: 0.2s;
+    box-shadow: var(--shadow);
+  }
+
+  .week-col:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: #D5D0E0;
+  }
+
+  .week-col.today {
+    border-color: var(--pulse);
+  }
+
+  .week-col.selected {
+    background: var(--ink);
+    border-color: transparent;
+  }
+
+  .week-col.selected .wd-name,
+  .week-col.selected .wd-num,
+  .week-col.selected .chip {
+    color: #fff;
+  }
+
+  .wd-name {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  .wd-num {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .week-col .mini-ribbon {
+    margin-top: 0;
+  }
+
+  .chip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  .week-col.selected .chip {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .chip .sq {
+    width: 5px;
+    height: 5px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .chip.done {
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  .chip-more {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .week-col.selected .chip-more {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .chip-template {
+    background: rgba(108, 92, 231, 0.08);
+    border: 1px dashed var(--pulse);
+  }
+
+  .week-col.selected .chip-template {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .chip-template-icon {
+    font-size: 9px;
+  }
+
+  /* ===== CALENDAR MONTH ===== */
+  .weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .weekday-row div {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .daycell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 8px;
+    min-height: 64px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: 0.2s;
+    box-shadow: var(--shadow);
+  }
+
+  .daycell:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .daycell.other {
+    opacity: 0.3;
+  }
+
+  .daycell.today {
+    border-color: var(--pulse);
+  }
+
+  .daycell.selected {
+    background: var(--ink);
+    border-color: transparent;
+  }
+
+  .daycell.selected .daynum,
+  .daycell.selected .count {
+    color: #fff;
+  }
+
+  .daynum {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .count {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .mini-ribbon {
+    display: flex;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: #F0EEF5;
+    margin-top: auto;
+  }
+
+  .mini-ribbon > span {
+    height: 100%;
+  }
+
+  /* ===== TASK PANEL ===== */
+  .task-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+
+  .task-panel h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .task-row:last-of-type {
+    border-bottom: none;
+  }
+
+  .task-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--pulse);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .task-cat {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .task-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .task-title.done {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .task-time {
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .task-cat-label {
+    font-size: 14px;
+  }
+
+  .del-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: 0.15s;
+  }
+
+  .del-btn:hover {
+    color: #E17055;
+    background: var(--personal-l);
+  }
+
+  .empty-day {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 6px 0 14px;
+  }
+
+  .template-badge {
+    font-size: 9px;
+    background: var(--pulse);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 500;
+  }
+
+  /* ===== ADD FORM ===== */
+  .add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    align-items: center;
+  }
+
+  .add-form input[type="text"] {
+    flex: 1 1 180px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--bg);
+    transition: 0.15s;
+  }
+
+  .add-form input[type="text"]:focus {
+    border-color: var(--pulse);
+    background: var(--surface);
+  }
+
+  .add-form select {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .add-form .time-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .add-form .time-field label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .add-form input[type="time"] {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+  }
+
+  .add-form input[type="time"]:focus {
+    border-color: var(--pulse);
+    background: var(--surface);
+  }
+
+  .add-form button {
+    background: var(--pulse);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.25);
+  }
+
+  .add-form button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35);
+  }
+
+  .add-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* ===== TEMPLATES ===== */
+  .templates-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .templates-section h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
+  }
+
+  .template-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    margin-bottom: 4px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .template-item .days {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .template-item .del-tpl {
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+    transition: 0.15s;
+  }
+
+  .template-item .del-tpl:hover {
+    color: #E17055;
+  }
+
+  .add-template-btn {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: inherit;
+    transition: 0.15s;
+  }
+
+  .add-template-btn:hover {
+    border-color: var(--pulse);
+    color: var(--pulse);
+  }
+
+  /* ===== MODALS ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 22, 37, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 70;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .overlay[hidden] {
+    display: none;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(26, 22, 37, 0.2);
+    animation: fadeInUp 0.2s ease both;
+  }
+
+  .modal h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .modal p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  .modal input,
+  .modal select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--bg);
+    margin-bottom: 10px;
+  }
+
+  .modal input:focus,
+  .modal select:focus {
+    border-color: var(--pulse);
+    background: var(--surface);
+  }
+
+  .modal .row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .modal button {
+    flex: 1;
+    padding: 9px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .modal .go {
+    background: var(--pulse);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+  }
+
+  .modal .cancel {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .weekday-checkboxes {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin: 6px 0 10px;
+  }
+
+  .weekday-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    transition: 0.15s;
+  }
+
+  .weekday-checkboxes label.active {
+    background: var(--study-l);
+    border-color: var(--pulse);
+  }
+
+  .weekday-checkboxes input[type="checkbox"] {
+    accent-color: var(--pulse);
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(26, 22, 37, 0.25);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: 0.25s;
+    pointer-events: none;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 80vw;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast.err {
+    background: #E17055;
+  }
+
+  /* ===== MISC ===== */
+  .loading {
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 0;
+    font-size: 14px;
+  }
+
+  .setup-banner {
+    background: #FFF8EE;
+    border: 1px solid #F0D8A8;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #7A6A3A;
+  }
+
+  .setup-banner code {
+    background: #F5EED6;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 680px) {
+    #app {
+      padding: 16px 14px 40px;
+    }
+
+    .week-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .week-col {
+      min-height: auto;
+    }
+
+    .month-grid {
+      gap: 4px;
+    }
+
+    .daycell {
+      min-height: 48px;
+      padding: 6px 4px;
+    }
+
+    .nav .label {
+      min-width: auto;
+      font-size: 13px;
+    }
+
+    .schedule-grid {
+      font-size: 12px;
+      gap: 4px 12px;
+    }
+
+    .topbar .flex-between {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .viewtoggle {
+      width: 100%;
+    }
+
+    .viewtoggle button {
+      flex: 1;
+      text-align: center;
+      padding: 6px 12px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .week-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -197,8 +1141,8 @@
 <div class="overlay" id="code-overlay" hidden>
   <div class="modal">
     <h3>Войти по коду</h3>
-    <p>Введи код, который получил(а) на другом устройстве — увидишь свой планировщик здесь.</p>
-    <input type="text" id="code-input" placeholder="НАПРИМЕР 7F3K9Q" maxlength="8">
+    <p>Введи код доступа, чтобы синхронизировать данные с другим устройством.</p>
+    <input type="text" id="code-input" placeholder="Например: 7F3K9Q" maxlength="8" style="text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">
     <div class="row">
       <button class="cancel" id="code-cancel">Отмена</button>
       <button class="go" id="code-go">Войти</button>
@@ -209,19 +1153,19 @@
 <div class="overlay" id="template-overlay" hidden>
   <div class="modal">
     <h3>➕ Регулярная задача</h3>
-    <p>Задача будет автоматически добавляться на выбранные дни каждую неделю.</p>
-    <input type="text" id="tpl-title" placeholder="Что делать регулярно?" style="text-transform:none;letter-spacing:normal;">
+    <p>Будет автоматически добавляться на выбранные дни каждую неделю.</p>
+    <input type="text" id="tpl-title" placeholder="Название задачи" style="text-transform:none;letter-spacing:normal;">
     <select id="tpl-cat">
       <option value="study">📚 Учёба</option>
       <option value="work">💼 Работа</option>
       <option value="training">🏋️ Тренировки</option>
-      <option value="personal">🌿 Личное / отдых</option>
+      <option value="personal">🌿 Личное</option>
     </select>
-    <div style="display:flex;gap:8px;margin:8px 0;">
-      <div class="time-field"><label for="tpl-start">начало</label><input type="time" id="tpl-start"></div>
-      <div class="time-field"><label for="tpl-end">конец</label><input type="time" id="tpl-end"></div>
+    <div style="display:flex;gap:8px;">
+      <div class="time-field" style="flex:1;"><label for="tpl-start" style="font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;display:block;margin-bottom:2px;">Начало</label><input type="time" id="tpl-start" style="width:100%;"></div>
+      <div class="time-field" style="flex:1;"><label for="tpl-end" style="font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;display:block;margin-bottom:2px;">Конец</label><input type="time" id="tpl-end" style="width:100%;"></div>
     </div>
-    <div style="font-size:12px;color:var(--muted);margin-top:4px;">Выбери дни недели:</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">Дни недели:</div>
     <div class="weekday-checkboxes" id="tpl-days">
       <label><input type="checkbox" value="1"> Пн</label>
       <label><input type="checkbox" value="2"> Вт</label>
@@ -231,9 +1175,9 @@
       <label><input type="checkbox" value="6"> Сб</label>
       <label><input type="checkbox" value="0"> Вс</label>
     </div>
-    <div class="row" style="margin-top:12px;">
+    <div class="row" style="margin-top:10px;">
       <button class="cancel" id="tpl-cancel">Отмена</button>
-      <button class="go" id="tpl-save">Сохранить шаблон</button>
+      <button class="go" id="tpl-save">Сохранить</button>
     </div>
   </div>
 </div>
@@ -247,10 +1191,10 @@ const TEMPLATES_TABLE = 'templates';
 /* ============================================ */
 
 const CATEGORIES = {
-  study:    { label:'Учёба',          hex:'#7C5CFF', emoji:'📚' },
-  work:     { label:'Работа',         hex:'#FF9F43', emoji:'💼' },
-  training: { label:'Тренировки',     hex:'#12C48B', emoji:'🏋️' },
-  personal: { label:'Личное / отдых', hex:'#FF5D8F', emoji:'🌿' },
+  study:    { label:'Учёба',          hex:'#6C5CE7', emoji:'📚' },
+  work:     { label:'Работа',         hex:'#F39C12', emoji:'💼' },
+  training: { label:'Тренировки',     hex:'#00B894', emoji:'🏋️' },
+  personal: { label:'Личное',         hex:'#E17055', emoji:'🌿' },
 };
 const CAT_ORDER = ['study','work','training','personal'];
 const WEEKDAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -333,7 +1277,6 @@ async function fetchTemplates(){
     const rows = await res.json();
     return rows.map(r=>({ id:r.id, title:r.title, category:r.category, start:r.start_time, end:r.end_time, days:r.days }));
   }catch(e){
-    // таблица может не существовать - это нормально
     return [];
   }
 }
@@ -454,7 +1397,6 @@ function applyTemplatesToWeek(weekStart){
       d = addDays(d, diff);
       if(d <= weekEnd && d >= weekStart){
         const key = toKey(d);
-        // проверяем, нет ли уже такого события на эту дату (чтобы не дублировать)
         const exists = state.events.some(e => 
           e.date === key && 
           e.title === tpl.title && 
@@ -505,15 +1447,87 @@ function render(){
   const app = document.getElementById('app');
   const today = new Date();
 
+  // Данные для дня
+  const selKey = toKey(state.selected);
+  const dayEvs = sortByStart(eventsOn(selKey));
+
+  // Блок расписания на день
+  const scheduleHTML = `
+    <div class="day-schedule">
+      <div class="day-schedule-header">
+        <h3>📋 Расписание на день</h3>
+        <span class="date">${fullDayLabel(state.selected)}</span>
+      </div>
+      <div class="schedule-grid">
+        ${dayEvs.length ? dayEvs.map(e => `
+          <div class="time">${timeLabel(e)}</div>
+          <div class="task ${e.done?'done':''}">
+            <span class="dot" style="background:${CATEGORIES[e.category].hex}"></span>
+            ${escapeHTML(e.title)}
+            ${e.is_template ? '<span style="font-size:9px;color:var(--muted);margin-left:4px;">🔄</span>' : ''}
+          </div>
+        `).join('') : `
+          <div class="time">—</div>
+          <div class="schedule-empty">Нет дел на этот день</div>
+        `}
+      </div>
+    </div>
+  `;
+
+  // Блок задач на день (бывший panel)
+  const tasksHTML = dayEvs.length ? dayEvs.map(e=>{
+    const isTemplate = e.is_template;
+    return `<div class="task-row" data-row="${e.id}">
+      <input type="checkbox" ${e.done?'checked':''} data-toggle="${e.id}">
+      <span class="task-cat" style="background:${CATEGORIES[e.category].hex}"></span>
+      <span class="task-title ${e.done?'done':''}">${isTemplate?'🔄 ':''}${escapeHTML(e.title)}${isTemplate?' <span class="template-badge">шаблон</span>':''}</span>
+      <span class="task-time">${timeLabel(e)}</span>
+      <span class="task-cat-label">${CATEGORIES[e.category].emoji}</span>
+      <button class="del-btn" data-del="${e.id}" aria-label="Удалить">×</button>
+    </div>`;
+  }).join('') : `<div class="empty-day">Нет задач на этот день</div>`;
+
+  const taskPanelHTML = `
+    <div class="task-panel">
+      <h2>📌 Задачи на день</h2>
+      ${tasksHTML}
+      <form class="add-form" id="add-form">
+        <input type="text" id="new-title" placeholder="Новая задача" required maxlength="120">
+        <select id="new-cat">
+          ${CAT_ORDER.map(k=>`<option value="${k}">${CATEGORIES[k].emoji} ${CATEGORIES[k].label}</option>`).join('')}
+        </select>
+        <div class="time-field"><label for="new-start">с</label><input type="time" id="new-start" required></div>
+        <div class="time-field"><label for="new-end">по</label><input type="time" id="new-end"></div>
+        <button type="submit" ${state.online?'':'disabled'}>Добавить</button>
+        <div class="hint">Конец необязателен</div>
+      </form>
+      
+      <div class="templates-section">
+        <h3>🔄 Регулярные задачи</h3>
+        ${state.templates.length ? state.templates.map(tpl => {
+          const dayNames = tpl.days.split(',').map(d => WEEKDAYS[Number(d)]).join(', ');
+          return `<div class="template-item">
+            <span>🔄 ${escapeHTML(tpl.title)}</span>
+            <span class="days">${dayNames} ${tpl.start}${tpl.end?'–'+tpl.end:''}</span>
+            <span>${CATEGORIES[tpl.category].emoji}</span>
+            <button class="del-tpl" data-tpl-del="${tpl.id}">×</button>
+          </div>`;
+        }).join('') : '<div style="color:var(--muted);font-size:12px;padding:4px 0;">Нет регулярных задач</div>'}
+        <button class="add-template-btn" id="add-template-btn">+ Добавить регулярную задачу</button>
+      </div>
+    </div>
+  `;
+
+  // Баланс
   let rangeStart, rangeEnd, balanceTitle;
   if(state.view==='month'){
     rangeStart = startOfMonth(state.anchor);
     rangeEnd = new Date(state.anchor.getFullYear(), state.anchor.getMonth()+1, 0);
-    balanceTitle = '✨ Баланс месяца';
+    balanceTitle = 'Баланс месяца';
   }else{
     rangeStart = startOfWeek(state.anchor);
     rangeEnd = addDays(rangeStart,6);
-    balanceTitle = '✨ Баланс недели';
+    balanceTitle = 'Баланс недели';
   }
   const rangeEvents = eventsInRange(rangeStart,rangeEnd);
   const {counts,total} = ribbonSegments(rangeEvents);
@@ -530,10 +1544,11 @@ function render(){
   const balanceHTML = `
     <div class="balance-card">
       <div class="btitle">${balanceTitle}</div>
-      ${renderRibbonHTML(counts,total,16)}
-      ${total>0 ? legendHTML : `<div class="empty-note">Пока нет запланированных дел на этот период — добавьте первое ниже.</div>`}
+      ${renderRibbonHTML(counts,total,8)}
+      ${total>0 ? legendHTML : `<div class="empty-note">Нет запланированных дел на этот период</div>`}
     </div>`;
 
+  // Календарь
   let calendarHTML = '';
   if(state.view==='month'){
     const first = startOfMonth(state.anchor);
@@ -549,8 +1564,8 @@ function render(){
       const isSel = sameDay(d,state.selected);
       return `<button class="daycell ${isOther?'other':''} ${isToday?'today':''} ${isSel?'selected':''}" data-date="${key}">
         <span class="daynum">${d.getDate()}</span>
-        ${t>0?`<span class="count">${t} дел${t===1?'о':t<5?'а':''}</span>`:''}
-        ${renderRibbonHTML(c,t,6)}
+        ${t>0?`<span class="count">${t}</span>`:''}
+        ${renderRibbonHTML(c,t,4)}
       </button>`;
     }).join('');
     calendarHTML = weekdayRow + `<div class="month-grid">${cellsHTML}</div>`;
@@ -572,87 +1587,55 @@ function render(){
           ${timeLabel(e)} · ${escapeHTML(e.title)}
         </div>`;
       }).join('');
-      const more = evs.length>4 ? `<div class="chip-more">+${evs.length-4} ещё</div>` : '';
+      const more = evs.length>4 ? `<div class="chip-more">+${evs.length-4}</div>` : '';
       return `<button class="week-col ${isToday?'today':''} ${isSel?'selected':''}" data-date="${key}">
         <div><div class="wd-name">${WEEKDAYS[(d.getDay()+6)%7]}</div><div class="wd-num">${d.getDate()}</div></div>
-        ${renderRibbonHTML(c,t,6)}
+        ${renderRibbonHTML(c,t,4)}
         <div class="chip-list">${chips}${more}</div>
       </button>`;
     }).join('') + `</div>`;
   }
 
-  const selKey = toKey(state.selected);
-  const dayEvs = sortByStart(eventsOn(selKey));
-  const tasksHTML = dayEvs.length ? dayEvs.map(e=>{
-    const isTemplate = e.is_template;
-    return `<div class="task-row" data-row="${e.id}">
-      <input type="checkbox" ${e.done?'checked':''} data-toggle="${e.id}">
-      <span class="task-cat" style="background:${CATEGORIES[e.category].hex}"></span>
-      <span class="task-title ${e.done?'done':''}">${isTemplate?'🔄 ':''}${escapeHTML(e.title)}${isTemplate?' <span class="template-badge">шаблон</span>':''}</span>
-      <span class="task-time">${timeLabel(e)}</span>
-      <span class="task-cat-label" title="${CATEGORIES[e.category].label}">${CATEGORIES[e.category].emoji}</span>
-      <button class="del-btn" data-del="${e.id}" aria-label="Удалить">×</button>
-    </div>`;
-  }).join('') : `<div class="empty-day">Пока ничего не запланировано. Добавьте первое дело ниже.</div>`;
-
-  const templatesHTML = state.templates.length ? state.templates.map(tpl => {
-    const dayNames = tpl.days.split(',').map(d => WEEKDAYS[Number(d)]).join(', ');
-    return `<div class="template-item">
-      <span>🔄 ${escapeHTML(tpl.title)}</span>
-      <span class="days">${dayNames} ${tpl.start}${tpl.end?'–'+tpl.end:''}</span>
-      <span>${CATEGORIES[tpl.category].emoji}</span>
-      <button class="del-tpl" data-tpl-del="${tpl.id}">×</button>
-    </div>`;
-  }).join('') : '<div style="color:var(--muted);font-size:13px;padding:4px 0;">Нет регулярных задач</div>';
-
-  const panelHTML = `
-    <div class="panel">
-      <h2>${fullDayLabel(state.selected)}</h2>
-      ${tasksHTML}
-      <form class="add-form" id="add-form">
-        <input type="text" id="new-title" placeholder="Что нужно сделать?" required maxlength="120">
-        <select id="new-cat">
-          ${CAT_ORDER.map(k=>`<option value="${k}">${CATEGORIES[k].emoji} ${CATEGORIES[k].label}</option>`).join('')}
-        </select>
-        <div class="time-field"><label for="new-start">начало</label><input type="time" id="new-start" required></div>
-        <div class="time-field"><label for="new-end">конец</label><input type="time" id="new-end"></div>
-        <button type="submit" ${state.online?'':'disabled'}>Добавить</button>
-        <div class="hint">Конец необязателен — можно отметить только время начала.</div>
-      </form>
-      
-      <div class="templates-section">
-        <h3>🔄 Регулярные задачи (повторяются каждую неделю)</h3>
-        ${templatesHTML}
-        <button class="add-template-btn" id="add-template-btn">+ Добавить регулярную задачу</button>
-      </div>
-    </div>`;
-
   const setupBanner = state.online ? '' : `
     <div class="setup-banner">
-      Сервер ещё не подключён. Впиши <code>SUPABASE_URL</code> и <code>SUPABASE_ANON_KEY</code> в начале файла (из Project Settings → API в Supabase), пересохрани файл — и данные начнут сохраняться на сервере.
+      ⚠️ Сервер не подключён. Впиши <code>SUPABASE_URL</code> и <code>SUPABASE_ANON_KEY</code> в начале файла.
     </div>`;
+
+  const statusDot = state.online ? 'online' : 'offline';
 
   app.innerHTML = `
     <div class="topbar">
-      <div class="brand">
-        <span class="mark">💜</span>
-        <div>
-          <div class="disp">Pulse 1one</div>
-          <div class="sub">Учёба, работа, тренировки — в одном ритме</div>
+      <div class="flex-between">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="18" stroke="#6C5CE7" stroke-width="2.5"/>
+              <path d="M20 6 L20 34 M6 20 L34 20" stroke="#6C5CE7" stroke-width="2" opacity="0.3"/>
+              <circle cx="20" cy="20" r="4" fill="#6C5CE7"/>
+              <path d="M20 12 C26 12 28 20 20 28 C12 20 14 12 20 12Z" fill="#6C5CE7" opacity="0.15"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <div class="logo-name">Pulse <span>1</span>one</div>
+            <div class="logo-sub">управление временем</div>
+          </div>
         </div>
-      </div>
-      <div class="viewtoggle">
-        <button data-view="week" class="${state.view==='week'?'active':''}">Неделя</button>
-        <button data-view="month" class="${state.view==='month'?'active':''}">Месяц</button>
+        <div class="flex" style="gap:8px;">
+          <span class="status ${statusDot}" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${state.online?'#00B894':'#E17055'};"></span>
+          <div class="viewtoggle">
+            <button data-view="week" class="${state.view==='week'?'active':''}">Неделя</button>
+            <button data-view="month" class="${state.view==='month'?'active':''}">Месяц</button>
+          </div>
+        </div>
       </div>
     </div>
     ${setupBanner}
     <div class="code-bar">
-      <span class="lbl">Твой код доступа:</span>
+      <span class="lbl">Код доступа</span>
       <span class="code-pill">${state.code}</span>
-      <button id="copy-code">Скопировать</button>
+      <button id="copy-code">Копировать</button>
       <span class="spacer"></span>
-      <button id="switch-code">Войти по другому коду</button>
+      <button id="switch-code">Сменить код</button>
     </div>
     <div class="nav">
       <button data-nav="-1">‹</button>
@@ -660,9 +1643,10 @@ function render(){
       <button data-nav="1">›</button>
       <button class="today" data-nav="today">Сегодня</button>
     </div>
+    ${scheduleHTML}
+    ${taskPanelHTML}
     ${balanceHTML}
     ${calendarHTML}
-    ${panelHTML}
   `;
 
   attachHandlers();
@@ -692,10 +1676,8 @@ function attachHandlers(){
       const ev = state.events.find(e=>e.id===el.dataset.toggle);
       if(!ev) return;
       ev.done = !ev.done;
-      const row = document.querySelector(`[data-row="${ev.id}"]`);
-      if(row && ev.done){ row.classList.add('just-done'); }
       await patchEvent(ev.id, {done: ev.done});
-      setTimeout(render, ev.done ? 420 : 0);
+      setTimeout(render, 300);
     };
   });
   document.querySelectorAll('[data-del]').forEach(el=>{
@@ -786,7 +1768,7 @@ document.getElementById('tpl-save').onclick = async ()=>{
   const cat = document.getElementById('tpl-cat').value;
   const checkboxes = document.querySelectorAll('#tpl-days input:checked');
   if(!title || !start || checkboxes.length === 0){
-    showToast('Заполни название, время и выбери дни', true);
+    showToast('Заполни все поля и выбери дни', true);
     return;
   }
   const days = Array.from(checkboxes).map(cb => cb.value).join(',');
@@ -796,13 +1778,11 @@ document.getElementById('tpl-save').onclick = async ()=>{
   const created = await insertTemplate(payload);
   if(created){
     state.templates.push({ id:created.id, title, start, end: end||null, category: cat, days });
-    // Применяем шаблон на текущую неделю
     await applyAllTemplates();
     render();
   }
 };
 
-// Настройка кликов по чекбоксам дней в модалке
 document.querySelectorAll('#tpl-days label').forEach(label => {
   const cb = label.querySelector('input');
   cb.onchange = ()=>{
@@ -817,7 +1797,6 @@ document.querySelectorAll('#tpl-days label').forEach(label => {
   }
   state.events = await fetchEvents();
   state.templates = await fetchTemplates();
-  // Применяем шаблоны при загрузке
   await applyAllTemplates();
   render();
 })();
