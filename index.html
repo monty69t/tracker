@@ -17,6 +17,7 @@
     --work:#FF9F43;  --work-l:#fff2e2;
     --training:#12C48B; --training-l:#e2faf3;
     --personal:#FF5D8F; --personal-l:#ffe7ee;
+    --pulse:#FF5D8F;
     --radius:20px;
   }
   *{box-sizing:border-box;}
@@ -40,16 +41,20 @@
   @keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
   @keyframes pulseGood{0%{background:rgba(18,196,139,.16);}100%{background:transparent;}}
   @keyframes ribbonGrow{from{opacity:0;transform:scaleX(.85);}to{opacity:1;transform:scaleX(1);}}
+  @keyframes pulseGlow{
+    0%,100%{box-shadow:0 0 0 0 rgba(255,93,143,.4);}
+    50%{box-shadow:0 0 0 8px rgba(255,93,143,0);}
+  }
 
   .topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;animation:fadeInUp .35s ease both;}
   .brand{display:flex;align-items:center;gap:12px;}
-  .brand .mark{font-size:30px;line-height:1;filter:drop-shadow(0 2px 4px rgba(124,92,255,.25));}
-  .brand .disp{font-size:23px;font-weight:700;letter-spacing:-0.01em;}
+  .brand .mark{font-size:30px;line-height:1;filter:drop-shadow(0 2px 4px rgba(255,93,143,.25));}
+  .brand .disp{font-size:23px;font-weight:700;letter-spacing:-0.01em;background:linear-gradient(135deg, var(--pulse), var(--study));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
   .brand .sub{color:var(--muted);font-size:12.5px;margin-top:2px;}
 
   .viewtoggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;box-shadow:0 2px 10px rgba(124,92,255,.08);}
   .viewtoggle button{border:none;background:transparent;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Fredoka',sans-serif;transition:.18s;}
-  .viewtoggle button.active{background:linear-gradient(135deg,var(--study),#9b7bff);color:#fff;box-shadow:0 3px 10px rgba(124,92,255,.35);}
+  .viewtoggle button.active{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;box-shadow:0 3px 10px rgba(255,93,143,.35);}
   .viewtoggle button:not(.active):hover{color:var(--ink);}
 
   .code-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:18px;animation:fadeInUp .3s ease both;}
@@ -110,6 +115,9 @@
   .chip.done{opacity:.5;text-decoration:line-through;}
   .chip-more{font-size:10.5px;color:var(--muted);}
   .week-col.selected .chip-more{color:rgba(255,255,255,.7);}
+  .chip-template{background:rgba(255,93,143,.12);border:1px dashed var(--pulse);}
+  .week-col.selected .chip-template{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);}
+  .chip-template-icon{font-size:10px;}
 
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:0 6px 24px rgba(124,92,255,.08);animation:fadeInUp .3s ease both;}
   .panel h2{font-size:17px;margin:0 0 14px;}
@@ -125,6 +133,7 @@
   .del-btn{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:17px;line-height:1;padding:4px 6px;border-radius:8px;transition:.15s;}
   .del-btn:hover{color:#e0447a;background:var(--personal-l);}
   .empty-day{color:var(--muted);font-size:13.5px;padding:8px 0 16px;}
+  .template-badge{font-size:10px;background:var(--pulse);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px;}
 
   .add-form{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);align-items:center;}
   .add-form input[type=text]{flex:1 1 200px;padding:10px 13px;border:1px solid var(--border);border-radius:11px;font-size:14px;font-family:inherit;background:#FBFAFE;}
@@ -133,8 +142,8 @@
   .add-form .time-field label{font-size:11px;color:var(--muted);}
   .add-form input[type=time]{padding:10px 11px;border:1px solid var(--border);border-radius:11px;font-size:13px;font-family:inherit;background:#FBFAFE;}
   .add-form input:focus, .add-form select:focus{border-color:var(--study);}
-  .add-form button{background:linear-gradient(135deg,var(--study),#9b7bff);color:#fff;border:none;padding:10px 20px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Fredoka',sans-serif;transition:.15s;box-shadow:0 4px 14px rgba(124,92,255,.3);}
-  .add-form button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,92,255,.4);}
+  .add-form button{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;border:none;padding:10px 20px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Fredoka',sans-serif;transition:.15s;box-shadow:0 4px 14px rgba(255,93,143,.3);}
+  .add-form button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,93,143,.4);}
   .add-form button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
   .hint{font-size:11.5px;color:var(--muted);width:100%;margin-top:-2px;}
 
@@ -146,17 +155,31 @@
 
   .overlay{position:fixed;inset:0;background:rgba(43,33,64,.45);display:flex;align-items:center;justify-content:center;z-index:70;padding:20px;}
   .overlay[hidden]{display:none;}
-  .modal{background:var(--surface);border-radius:18px;padding:24px;max-width:360px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:fadeInUp .2s ease both;}
+  .modal{background:var(--surface);border-radius:18px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:fadeInUp .2s ease both;max-height:90vh;overflow-y:auto;}
   .modal h3{margin:0 0 6px;font-size:17px;}
   .modal p{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.5;}
   .modal input{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:'Fredoka',sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
   .modal .row{display:flex;gap:8px;}
   .modal button{flex:1;padding:10px;border-radius:10px;border:none;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Fredoka',sans-serif;}
-  .modal .go{background:linear-gradient(135deg,var(--study),#9b7bff);color:#fff;}
+  .modal .go{background:linear-gradient(135deg,var(--pulse),var(--study));color:#fff;}
   .modal .cancel{background:#F1EEF7;color:var(--ink);}
 
   .setup-banner{background:#fff7e6;border:1px solid #f2d98a;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:13px;line-height:1.6;color:#6b5d1f;}
   .setup-banner code{background:#fdeecb;padding:1px 6px;border-radius:5px;font-size:12px;}
+
+  .templates-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+  .templates-section h3{font-size:14px;margin:0 0 10px;color:var(--muted);font-family:'Fredoka',sans-serif;}
+  .template-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#FBFAFE;border-radius:10px;margin-bottom:6px;border:1px solid var(--border);}
+  .template-item .days{font-size:11px;color:var(--muted);}
+  .template-item .del-tpl{border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px;}
+  .template-item .del-tpl:hover{color:#e0447a;}
+  .add-template-btn{background:var(--surface);border:1px dashed var(--border);border-radius:10px;padding:10px;width:100%;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;transition:.15s;}
+  .add-template-btn:hover{border-color:var(--pulse);color:var(--pulse);}
+
+  .weekday-checkboxes{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+  .weekday-checkboxes label{display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:8px;border:1px solid var(--border);background:#FBFAFE;}
+  .weekday-checkboxes label.active{background:var(--study-l);border-color:var(--study);}
+  .weekday-checkboxes input[type=checkbox]{accent-color:var(--study);}
 
   @media(max-width:680px){
     .week-grid{grid-template-columns:1fr;}
@@ -183,13 +206,44 @@
   </div>
 </div>
 
+<div class="overlay" id="template-overlay" hidden>
+  <div class="modal">
+    <h3>➕ Регулярная задача</h3>
+    <p>Задача будет автоматически добавляться на выбранные дни каждую неделю.</p>
+    <input type="text" id="tpl-title" placeholder="Что делать регулярно?" style="text-transform:none;letter-spacing:normal;">
+    <select id="tpl-cat">
+      <option value="study">📚 Учёба</option>
+      <option value="work">💼 Работа</option>
+      <option value="training">🏋️ Тренировки</option>
+      <option value="personal">🌿 Личное / отдых</option>
+    </select>
+    <div style="display:flex;gap:8px;margin:8px 0;">
+      <div class="time-field"><label for="tpl-start">начало</label><input type="time" id="tpl-start"></div>
+      <div class="time-field"><label for="tpl-end">конец</label><input type="time" id="tpl-end"></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px;">Выбери дни недели:</div>
+    <div class="weekday-checkboxes" id="tpl-days">
+      <label><input type="checkbox" value="1"> Пн</label>
+      <label><input type="checkbox" value="2"> Вт</label>
+      <label><input type="checkbox" value="3"> Ср</label>
+      <label><input type="checkbox" value="4"> Чт</label>
+      <label><input type="checkbox" value="5"> Пт</label>
+      <label><input type="checkbox" value="6"> Сб</label>
+      <label><input type="checkbox" value="0"> Вс</label>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <button class="cancel" id="tpl-cancel">Отмена</button>
+      <button class="go" id="tpl-save">Сохранить шаблон</button>
+    </div>
+  </div>
+</div>
+
 <script>
-/* ====== НАСТРОЙКИ БЭКЕНДА (Supabase) ======
-   Впиши сюда свои значения из Project Settings → API
-*/
+/* ====== НАСТРОЙКИ БЭКЕНДА (Supabase) ====== */
 const SUPABASE_URL = 'https://rrweviidvjbhwazaowff.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_TcPfcOeyHwanGaKhWQQzKg_q42aU83h';
 const TABLE = 'tasks';
+const TEMPLATES_TABLE = 'templates';
 /* ============================================ */
 
 const CATEGORIES = {
@@ -212,8 +266,8 @@ function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function startOfWeek(d){const dow=(d.getDay()+6)%7;return addDays(new Date(d.getFullYear(),d.getMonth(),d.getDate()),-dow);}
 function startOfMonth(d){return new Date(d.getFullYear(),d.getMonth(),1);}
 
-const CODE_KEY = 'hronograf_code';
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // без похожих символов O/0/I/1
+const CODE_KEY = 'pulse_code';
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function generateCode(){
   let s='';
   for(let i=0;i<6;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];
@@ -244,6 +298,7 @@ let state = {
   anchor: new Date(),
   selected: new Date(),
   events: [],
+  templates: [],
   code: getUserCode(),
   online: isConfigured(),
 };
@@ -263,12 +318,26 @@ async function fetchEvents(){
     const res = await sbFetch(`/rest/v1/${TABLE}?user_code=eq.${encodeURIComponent(state.code)}&select=*&order=date.asc,start_time.asc`);
     if(!res.ok) throw new Error('bad status '+res.status);
     const rows = await res.json();
-    return rows.map(r=>({ id:r.id, date:r.date, start:r.start_time, end:r.end_time, title:r.title, category:r.category, done:r.done }));
+    return rows.map(r=>({ id:r.id, date:r.date, start:r.start_time, end:r.end_time, title:r.title, category:r.category, done:r.done, is_template:r.is_template||false }));
   }catch(e){
     showToast('Не удалось загрузить данные с сервера', true);
     return [];
   }
 }
+
+async function fetchTemplates(){
+  if(!state.online) return [];
+  try{
+    const res = await sbFetch(`/rest/v1/${TEMPLATES_TABLE}?user_code=eq.${encodeURIComponent(state.code)}&select=*`);
+    if(!res.ok) throw new Error('bad status '+res.status);
+    const rows = await res.json();
+    return rows.map(r=>({ id:r.id, title:r.title, category:r.category, start:r.start_time, end:r.end_time, days:r.days }));
+  }catch(e){
+    // таблица может не существовать - это нормально
+    return [];
+  }
+}
+
 async function insertEvent(ev){
   try{
     const res = await sbFetch(`/rest/v1/${TABLE}`, {
@@ -276,7 +345,7 @@ async function insertEvent(ev){
       headers:{ 'Prefer':'return=representation' },
       body: JSON.stringify([{
         user_code: state.code, date: ev.date, start_time: ev.start, end_time: ev.end,
-        title: ev.title, category: ev.category, done: false
+        title: ev.title, category: ev.category, done: false, is_template: ev.is_template||false
       }])
     });
     if(!res.ok) throw new Error('insert failed');
@@ -288,6 +357,7 @@ async function insertEvent(ev){
     return null;
   }
 }
+
 async function patchEvent(id, patch){
   try{
     const res = await sbFetch(`/rest/v1/${TABLE}?id=eq.${id}`, { method:'PATCH', body: JSON.stringify(patch) });
@@ -297,6 +367,7 @@ async function patchEvent(id, patch){
     showToast('Не удалось обновить дело', true);
   }
 }
+
 async function deleteEventRemote(id){
   try{
     const res = await sbFetch(`/rest/v1/${TABLE}?id=eq.${id}`, { method:'DELETE' });
@@ -304,6 +375,35 @@ async function deleteEventRemote(id){
     showToast('Удалено');
   }catch(e){
     showToast('Не удалось удалить дело', true);
+  }
+}
+
+async function insertTemplate(tpl){
+  try{
+    const res = await sbFetch(`/rest/v1/${TEMPLATES_TABLE}`, {
+      method:'POST',
+      headers:{ 'Prefer':'return=representation' },
+      body: JSON.stringify([{
+        user_code: state.code, title: tpl.title, category: tpl.category,
+        start_time: tpl.start, end_time: tpl.end, days: tpl.days
+      }])
+    });
+    if(!res.ok) throw new Error('insert template failed');
+    const rows = await res.json();
+    showToast('Шаблон сохранён ✓');
+    return rows[0];
+  }catch(e){
+    showToast('Не удалось сохранить шаблон', true);
+    return null;
+  }
+}
+
+async function deleteTemplateRemote(id){
+  try{
+    const res = await sbFetch(`/rest/v1/${TEMPLATES_TABLE}?id=eq.${id}`, { method:'DELETE' });
+    if(!res.ok) throw new Error('delete template failed');
+  }catch(e){
+    showToast('Не удалось удалить шаблон', true);
   }
 }
 
@@ -340,6 +440,66 @@ function formatRangeLabel(){
 }
 function fullDayLabel(d){ return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} — ${WEEKDAYS_FULL[(d.getDay()+6)%7]}`; }
 function escapeHTML(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function applyTemplatesToWeek(weekStart){
+  const weekEnd = addDays(weekStart, 6);
+  const newEvents = [];
+  state.templates.forEach(tpl => {
+    const days = tpl.days.split(',').map(Number);
+    days.forEach(day => {
+      let d = new Date(weekStart);
+      const currentDay = (d.getDay()+6)%7;
+      let diff = day - currentDay;
+      if(diff < 0) diff += 7;
+      d = addDays(d, diff);
+      if(d <= weekEnd && d >= weekStart){
+        const key = toKey(d);
+        // проверяем, нет ли уже такого события на эту дату (чтобы не дублировать)
+        const exists = state.events.some(e => 
+          e.date === key && 
+          e.title === tpl.title && 
+          e.start === tpl.start &&
+          e.is_template === true
+        );
+        if(!exists){
+          newEvents.push({
+            date: key,
+            start: tpl.start,
+            end: tpl.end,
+            title: tpl.title,
+            category: tpl.category,
+            done: false,
+            is_template: true,
+            _tempId: Date.now() + '_' + Math.random()
+          });
+        }
+      }
+    });
+  });
+  return newEvents;
+}
+
+async function applyAllTemplates(){
+  if(!state.online) return;
+  const today = new Date();
+  const weekStart = startOfWeek(today);
+  const newEvents = applyTemplatesToWeek(weekStart);
+  for(const ev of newEvents){
+    const created = await insertEvent(ev);
+    if(created){
+      state.events.push({ 
+        id: created.id, 
+        date: created.date, 
+        start: created.start_time, 
+        end: created.end_time, 
+        title: created.title, 
+        category: created.category, 
+        done: false,
+        is_template: true
+      });
+    }
+  }
+}
 
 function render(){
   const app = document.getElementById('app');
@@ -404,7 +564,14 @@ function render(){
       const isSel = sameDay(d,state.selected);
       const {counts:c,total:t} = ribbonSegments(evs);
       const shown = evs.slice(0,4);
-      const chips = shown.map(e=>`<div class="chip ${e.done?'done':''}"><span class="sq" style="background:${CATEGORIES[e.category].hex}"></span>${timeLabel(e)} · ${escapeHTML(e.title)}</div>`).join('');
+      const chips = shown.map(e => {
+        const isTemplate = e.is_template;
+        return `<div class="chip ${e.done?'done':''} ${isTemplate?'chip-template':''}">
+          ${isTemplate?'<span class="chip-template-icon">🔄</span>':''}
+          <span class="sq" style="background:${CATEGORIES[e.category].hex}"></span>
+          ${timeLabel(e)} · ${escapeHTML(e.title)}
+        </div>`;
+      }).join('');
       const more = evs.length>4 ? `<div class="chip-more">+${evs.length-4} ещё</div>` : '';
       return `<button class="week-col ${isToday?'today':''} ${isSel?'selected':''}" data-date="${key}">
         <div><div class="wd-name">${WEEKDAYS[(d.getDay()+6)%7]}</div><div class="wd-num">${d.getDate()}</div></div>
@@ -416,15 +583,27 @@ function render(){
 
   const selKey = toKey(state.selected);
   const dayEvs = sortByStart(eventsOn(selKey));
-  const tasksHTML = dayEvs.length ? dayEvs.map(e=>`
-    <div class="task-row" data-row="${e.id}">
+  const tasksHTML = dayEvs.length ? dayEvs.map(e=>{
+    const isTemplate = e.is_template;
+    return `<div class="task-row" data-row="${e.id}">
       <input type="checkbox" ${e.done?'checked':''} data-toggle="${e.id}">
       <span class="task-cat" style="background:${CATEGORIES[e.category].hex}"></span>
-      <span class="task-title ${e.done?'done':''}">${escapeHTML(e.title)}</span>
+      <span class="task-title ${e.done?'done':''}">${isTemplate?'🔄 ':''}${escapeHTML(e.title)}${isTemplate?' <span class="template-badge">шаблон</span>':''}</span>
       <span class="task-time">${timeLabel(e)}</span>
       <span class="task-cat-label" title="${CATEGORIES[e.category].label}">${CATEGORIES[e.category].emoji}</span>
       <button class="del-btn" data-del="${e.id}" aria-label="Удалить">×</button>
-    </div>`).join('') : `<div class="empty-day">Пока ничего не запланировано. Добавьте первое дело ниже.</div>`;
+    </div>`;
+  }).join('') : `<div class="empty-day">Пока ничего не запланировано. Добавьте первое дело ниже.</div>`;
+
+  const templatesHTML = state.templates.length ? state.templates.map(tpl => {
+    const dayNames = tpl.days.split(',').map(d => WEEKDAYS[Number(d)]).join(', ');
+    return `<div class="template-item">
+      <span>🔄 ${escapeHTML(tpl.title)}</span>
+      <span class="days">${dayNames} ${tpl.start}${tpl.end?'–'+tpl.end:''}</span>
+      <span>${CATEGORIES[tpl.category].emoji}</span>
+      <button class="del-tpl" data-tpl-del="${tpl.id}">×</button>
+    </div>`;
+  }).join('') : '<div style="color:var(--muted);font-size:13px;padding:4px 0;">Нет регулярных задач</div>';
 
   const panelHTML = `
     <div class="panel">
@@ -440,6 +619,12 @@ function render(){
         <button type="submit" ${state.online?'':'disabled'}>Добавить</button>
         <div class="hint">Конец необязателен — можно отметить только время начала.</div>
       </form>
+      
+      <div class="templates-section">
+        <h3>🔄 Регулярные задачи (повторяются каждую неделю)</h3>
+        ${templatesHTML}
+        <button class="add-template-btn" id="add-template-btn">+ Добавить регулярную задачу</button>
+      </div>
     </div>`;
 
   const setupBanner = state.online ? '' : `
@@ -450,7 +635,7 @@ function render(){
   app.innerHTML = `
     <div class="topbar">
       <div class="brand">
-        <span class="mark">⏱️</span>
+        <span class="mark">💜</span>
         <div>
           <div class="disp">Pulse 1one</div>
           <div class="sub">Учёба, работа, тренировки — в одном ритме</div>
@@ -521,6 +706,15 @@ function attachHandlers(){
       await deleteEventRemote(id);
     };
   });
+  document.querySelectorAll('[data-tpl-del]').forEach(el=>{
+    el.onclick = async ()=>{
+      const id = el.dataset.tplDel;
+      state.templates = state.templates.filter(t=>t.id!==id);
+      render();
+      await deleteTemplateRemote(id);
+    };
+  });
+  
   const form = document.getElementById('add-form');
   if(form){
     form.onsubmit = async (ev)=>{
@@ -531,14 +725,15 @@ function attachHandlers(){
       if(!title || !start) return;
       if(end && end <= start) end = '';
       const cat = document.getElementById('new-cat').value;
-      const payload = { date: toKey(state.selected), start, end: end||null, title, category: cat };
+      const payload = { date: toKey(state.selected), start, end: end||null, title, category: cat, is_template: false };
       const created = await insertEvent(payload);
       if(created){
-        state.events.push({ id:created.id, date:created.date, start:created.start_time, end:created.end_time, title:created.title, category:created.category, done:false });
+        state.events.push({ id:created.id, date:created.date, start:created.start_time, end:created.end_time, title:created.title, category:created.category, done:false, is_template:false });
         render();
       }
     };
   }
+  
   const copyBtn = document.getElementById('copy-code');
   if(copyBtn){
     copyBtn.onclick = async ()=>{
@@ -554,6 +749,18 @@ function attachHandlers(){
       document.getElementById('code-input').focus();
     };
   }
+  
+  const addTemplateBtn = document.getElementById('add-template-btn');
+  if(addTemplateBtn){
+    addTemplateBtn.onclick = ()=>{
+      document.getElementById('template-overlay').hidden = false;
+      document.getElementById('tpl-title').value = '';
+      document.getElementById('tpl-start').value = '20:00';
+      document.getElementById('tpl-end').value = '';
+      document.querySelectorAll('#tpl-days input').forEach(cb => cb.checked = false);
+      document.getElementById('tpl-title').focus();
+    };
+  }
 }
 
 const overlay = document.getElementById('code-overlay');
@@ -566,8 +773,42 @@ document.getElementById('code-go').onclick = async ()=>{
   state.code = val;
   document.getElementById('app').innerHTML = '<div class="loading">Загрузка…</div>';
   state.events = await fetchEvents();
+  state.templates = await fetchTemplates();
   render();
 };
+
+const tplOverlay = document.getElementById('template-overlay');
+document.getElementById('tpl-cancel').onclick = ()=>{ tplOverlay.hidden = true; };
+document.getElementById('tpl-save').onclick = async ()=>{
+  const title = document.getElementById('tpl-title').value.trim();
+  const start = document.getElementById('tpl-start').value;
+  const end = document.getElementById('tpl-end').value;
+  const cat = document.getElementById('tpl-cat').value;
+  const checkboxes = document.querySelectorAll('#tpl-days input:checked');
+  if(!title || !start || checkboxes.length === 0){
+    showToast('Заполни название, время и выбери дни', true);
+    return;
+  }
+  const days = Array.from(checkboxes).map(cb => cb.value).join(',');
+  tplOverlay.hidden = true;
+  
+  const payload = { title, start, end: end||null, category: cat, days };
+  const created = await insertTemplate(payload);
+  if(created){
+    state.templates.push({ id:created.id, title, start, end: end||null, category: cat, days });
+    // Применяем шаблон на текущую неделю
+    await applyAllTemplates();
+    render();
+  }
+};
+
+// Настройка кликов по чекбоксам дней в модалке
+document.querySelectorAll('#tpl-days label').forEach(label => {
+  const cb = label.querySelector('input');
+  cb.onchange = ()=>{
+    label.classList.toggle('active', cb.checked);
+  };
+});
 
 (async function init(){
   if(!state.online){
@@ -575,6 +816,9 @@ document.getElementById('code-go').onclick = async ()=>{
     return;
   }
   state.events = await fetchEvents();
+  state.templates = await fetchTemplates();
+  // Применяем шаблоны при загрузке
+  await applyAllTemplates();
   render();
 })();
 </script>
