@@ -5,21 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pulse 1one — контроль времени</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  /* ===== RESET & BASE ===== */
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
+  /* ===== THEME VARIABLES ===== */
   :root {
     --bg: #F8F7FA;
     --surface: #FFFFFF;
+    --surface-hover: #F0EEF5;
     --ink: #1A1625;
+    --ink-secondary: #2D2840;
     --muted: #78738A;
     --border: #EDEBF2;
+    --shadow: 0 1px 3px rgba(26,22,37,0.06), 0 4px 12px rgba(26,22,37,0.04);
+    --shadow-hover: 0 4px 16px rgba(26,22,37,0.08);
+    --shadow-modal: 0 20px 60px rgba(26,22,37,0.2);
     --study: #6C5CE7;
     --study-l: #F0EDFF;
     --work: #F39C12;
@@ -29,9 +28,56 @@
     --personal: #E17055;
     --personal-l: #FDF0ED;
     --pulse: #6C5CE7;
+    --code-bg: #F0EEF5;
+    --toast-bg: #1A1625;
+    --toast-text: #FFFFFF;
+    --modal-overlay: rgba(26,22,37,0.5);
+    --switch-bg: #EDEBF2;
+    --switch-dot: #FFFFFF;
+    --stats-bg: #F8F7FA;
+    --stats-border: #EDEBF2;
     --radius: 12px;
-    --shadow: 0 1px 3px rgba(26,22,37,0.06), 0 4px 12px rgba(26,22,37,0.04);
-    --shadow-hover: 0 4px 16px rgba(26,22,37,0.08);
+    --skeleton-bg: #E8E5F0;
+    --skeleton-shine: #F5F3FA;
+  }
+
+  [data-theme="dark"] {
+    --bg: #12111A;
+    --surface: #1E1B2E;
+    --surface-hover: #2D2840;
+    --ink: #EEECF5;
+    --ink-secondary: #D5D0E0;
+    --muted: #9A95B0;
+    --border: #2D2840;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+    --shadow-hover: 0 4px 16px rgba(108,92,231,0.15);
+    --shadow-modal: 0 20px 60px rgba(0,0,0,0.5);
+    --study: #7C6CFF;
+    --study-l: #2D2840;
+    --work: #F5A623;
+    --work-l: #2D2840;
+    --training: #00D9A0;
+    --training-l: #2D2840;
+    --personal: #F07A5E;
+    --personal-l: #2D2840;
+    --pulse: #7C6CFF;
+    --code-bg: #2D2840;
+    --toast-bg: #2D2840;
+    --toast-text: #EEECF5;
+    --modal-overlay: rgba(0,0,0,0.7);
+    --switch-bg: #2D2840;
+    --switch-dot: #7C6CFF;
+    --stats-bg: #1E1B2E;
+    --stats-border: #2D2840;
+    --skeleton-bg: #2D2840;
+    --skeleton-shine: #3D3855;
+  }
+
+  /* ===== RESET & BASE ===== */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   html, body {
@@ -45,36 +91,345 @@
     -webkit-font-smoothing: antialiased;
     background: var(--bg);
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
   }
 
   #app {
     max-width: 1024px;
     margin: 0 auto;
     padding: 24px 24px 60px;
+    min-height: 100vh;
   }
 
   /* ===== ANIMATIONS ===== */
   @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes ribbonGrow {
-    from {
-      opacity: 0;
-      transform: scaleX(0.85);
-    }
-    to {
-      opacity: 1;
-      transform: scaleX(1);
-    }
+    from { opacity: 0; transform: scaleX(0.85); }
+    to { opacity: 1; transform: scaleX(1); }
   }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(108, 92, 231, 0); }
+  }
+
+  @keyframes pulseWave {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== LOADING ANIMATIONS ===== */
+  @keyframes loadingPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+  }
+
+  @keyframes loadingDash {
+    0% { stroke-dashoffset: 150; }
+    50% { stroke-dashoffset: 50; }
+    100% { stroke-dashoffset: 150; }
+  }
+
+  @keyframes loadingFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes loadingDots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+  }
+
+  @keyframes particleFloat {
+    0% { opacity: 0; transform: translateY(20px) scale(0); }
+    20% { opacity: 0.6; transform: translateY(0) scale(1); }
+    80% { opacity: 0.6; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-20px) scale(0); }
+  }
+
+  /* ===== LOADING OVERLAY ===== */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .loading-logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: loadingFloat 2s ease-in-out infinite;
+  }
+
+  .loading-logo .icon-wrapper {
+    position: relative;
+    width: 56px;
+    height: 56px;
+  }
+
+  .loading-logo .icon-wrapper svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .loading-logo .icon-wrapper .ring {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--pulse);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: loadingPulse 2s ease-in-out infinite;
+  }
+
+  .loading-logo .icon-wrapper .ring:nth-child(2) {
+    animation-delay: 0.5s;
+    inset: -8px;
+    opacity: 0.1;
+  }
+
+  .loading-logo .text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .loading-logo .text .name {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .loading-logo .text .name span {
+    color: var(--pulse);
+    position: relative;
+  }
+
+  .loading-logo .text .name span::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--pulse);
+    border-radius: 2px;
+    opacity: 0.3;
+  }
+
+  .loading-logo .text .sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .loading-spinner {
+    position: relative;
+    width: 60px;
+    height: 60px;
+  }
+
+  .loading-spinner svg {
+    width: 60px;
+    height: 60px;
+    transform: rotate(-90deg);
+  }
+
+  .loading-spinner .circle-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 3;
+  }
+
+  .loading-spinner .circle-fg {
+    fill: none;
+    stroke: var(--pulse);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 150;
+    stroke-dashoffset: 150;
+    animation: loadingDash 1.8s ease-in-out infinite;
+  }
+
+  .loading-spinner .center-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    animation: loadingPulse 1.5s ease-in-out infinite;
+  }
+
+  .loading-progress {
+    width: 200px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .loading-progress .bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--pulse), var(--study), var(--training));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .loading-text {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .loading-text .dots::after {
+    content: '';
+    animation: loadingDots 1.5s steps(4, end) infinite;
+    display: inline-block;
+    width: 20px;
+    text-align: left;
+  }
+
+  .loading-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .loading-particles .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--pulse);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat 3s ease-in-out infinite;
+  }
+
+  .loading-particles .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+  .loading-particles .particle:nth-child(2) { left: 25%; animation-delay: 0.6s; width: 3px; height: 3px; }
+  .loading-particles .particle:nth-child(3) { left: 40%; animation-delay: 1.2s; width: 5px; height: 5px; }
+  .loading-particles .particle:nth-child(4) { left: 55%; animation-delay: 0.3s; }
+  .loading-particles .particle:nth-child(5) { left: 70%; animation-delay: 0.9s; width: 3px; height: 3px; }
+  .loading-particles .particle:nth-child(6) { left: 85%; animation-delay: 1.5s; width: 5px; height: 5px; }
+
+  /* ===== SKELETON LOADING ===== */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .skeleton {
+    background: var(--skeleton-bg);
+    background-image: linear-gradient(
+      90deg,
+      var(--skeleton-bg) 0%,
+      var(--skeleton-shine) 50%,
+      var(--skeleton-bg) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius);
+  }
+
+  .skeleton-text {
+    height: 14px;
+    border-radius: 4px;
+    width: 100%;
+  }
+
+  .skeleton-title {
+    height: 24px;
+    border-radius: 6px;
+    width: 60%;
+  }
+
+  .skeleton-card {
+    height: 80px;
+    border-radius: var(--radius);
+  }
+
+  .skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .skeleton-grid .skeleton-card {
+    height: 100px;
+  }
+
+  .skeleton-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .skeleton-week .skeleton-day {
+    height: 100px;
+    border-radius: var(--radius);
+  }
+
+  .fade-in {
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  .fade-in-d1 { animation-delay: 0.05s; }
+  .fade-in-d2 { animation-delay: 0.1s; }
+  .fade-in-d3 { animation-delay: 0.15s; }
+  .fade-in-d4 { animation-delay: 0.2s; }
+  .fade-in-d5 { animation-delay: 0.25s; }
+  .fade-in-d6 { animation-delay: 0.3s; }
+  .fade-in-d7 { animation-delay: 0.35s; }
+  .fade-in-d8 { animation-delay: 0.4s; }
+  .fade-in-d9 { animation-delay: 0.45s; }
+  .fade-in-d10 { animation-delay: 0.5s; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--pulse); }
 
   /* ===== LOGO ===== */
   .logo {
@@ -105,7 +460,7 @@
 
   .logo-name {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink);
   }
@@ -178,6 +533,47 @@
     background: var(--bg);
   }
 
+  /* ===== THEME TOGGLE ===== */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .theme-toggle .switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--switch-bg);
+    border-radius: 12px;
+    transition: 0.3s;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .theme-toggle .switch .dot {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: var(--switch-dot);
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .theme-toggle .switch.active .dot {
+    transform: translateX(20px);
+  }
+
+  .theme-toggle .icon {
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
   /* ===== CODE BAR ===== */
   .code-bar {
     display: flex;
@@ -201,7 +597,7 @@
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     letter-spacing: 0.06em;
-    background: var(--bg);
+    background: var(--code-bg);
     color: var(--ink);
     padding: 4px 12px;
     border-radius: 6px;
@@ -251,6 +647,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .nav button {
@@ -291,12 +688,181 @@
     background: var(--surface);
   }
 
+  /* ===== REPORT BUTTONS ===== */
+  .report-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    animation: slideUp 0.4s ease both;
+  }
+
+  .report-section-title {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+
+  .report-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .report-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    box-shadow: var(--shadow);
+    min-height: 60px;
+  }
+
+  .report-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--pulse);
+  }
+
+  .report-btn:active {
+    transform: translateY(0);
+  }
+
+  .report-btn.active {
+    border-color: var(--pulse);
+    background: var(--study-l);
+  }
+
+  [data-theme="dark"] .report-btn.active {
+    background: var(--surface-hover);
+  }
+
+  .report-btn .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .report-btn .icon {
+    font-size: 24px;
+  }
+
+  .report-btn .info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .report-btn .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .report-btn .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .report-btn .count-badge {
+    background: var(--pulse);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    min-width: 32px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .report-btn .count-badge.empty {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .report-btn:hover .count-badge {
+    transform: scale(1.05);
+  }
+
   /* ===== FOCUS ===== */
   button:focus-visible,
   input:focus-visible,
   select:focus-visible {
     outline: 2px solid var(--pulse);
     outline-offset: 2px;
+  }
+
+  /* ===== STATS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .stats-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    transition: 0.2s;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .stats-card .stats-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .stats-card .stats-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .stats-card .stats-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .stats-card .stats-bar {
+    margin-top: 8px;
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .stats-card .stats-bar .fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
   }
 
   /* ===== DAY SCHEDULE ===== */
@@ -348,11 +914,9 @@
     gap: 8px;
   }
 
-  .schedule-grid .task .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 3px;
-    flex-shrink: 0;
+  .schedule-grid .task .task-icon {
+    font-size: 14px;
+    line-height: 1;
   }
 
   .schedule-grid .task.done {
@@ -390,7 +954,7 @@
     height: 8px;
     border-radius: 4px;
     overflow: hidden;
-    background: #F0EEF5;
+    background: var(--bg);
     transform-origin: left;
     animation: ribbonGrow 0.5s ease both;
   }
@@ -401,7 +965,7 @@
   }
 
   .ribbon.empty {
-    background: #F0EEF5;
+    background: var(--bg);
   }
 
   .legend {
@@ -417,6 +981,10 @@
     gap: 6px;
     font-size: 12px;
     color: var(--muted);
+  }
+
+  .legend .item .cat-icon {
+    font-size: 14px;
   }
 
   .legend .dot {
@@ -464,7 +1032,7 @@
   .week-col:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover);
-    border-color: #D5D0E0;
+    border-color: var(--pulse);
   }
 
   .week-col.today {
@@ -472,7 +1040,7 @@
   }
 
   .week-col.selected {
-    background: var(--ink);
+    background: var(--pulse);
     border-color: transparent;
   }
 
@@ -494,6 +1062,15 @@
     font-size: 18px;
     font-weight: 700;
     font-family: 'Inter', sans-serif;
+    color: var(--ink);
+  }
+
+  [data-theme="dark"] .wd-num {
+    color: #FFFFFF;
+  }
+
+  [data-theme="dark"] .week-col.selected .wd-num {
+    color: #FFFFFF;
   }
 
   .week-col .mini-ribbon {
@@ -517,17 +1094,21 @@
     gap: 5px;
     line-height: 1.4;
     font-weight: 400;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+
+  .chip:hover {
+    background: var(--surface-hover);
   }
 
   .week-col.selected .chip {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.15);
   }
 
-  .chip .sq {
-    width: 5px;
-    height: 5px;
-    border-radius: 2px;
-    flex-shrink: 0;
+  .chip .chip-icon {
+    font-size: 10px;
+    line-height: 1;
   }
 
   .chip.done {
@@ -612,7 +1193,7 @@
   }
 
   .daycell.selected {
-    background: var(--ink);
+    background: var(--pulse);
     border-color: transparent;
   }
 
@@ -625,6 +1206,15 @@
     font-size: 14px;
     font-weight: 700;
     font-family: 'Inter', sans-serif;
+    color: var(--ink);
+  }
+
+  [data-theme="dark"] .daynum {
+    color: #FFFFFF;
+  }
+
+  [data-theme="dark"] .daycell.selected .daynum {
+    color: #FFFFFF;
   }
 
   .count {
@@ -637,7 +1227,7 @@
     height: 4px;
     border-radius: 2px;
     overflow: hidden;
-    background: #F0EEF5;
+    background: var(--bg);
     margin-top: auto;
   }
 
@@ -667,6 +1257,13 @@
     gap: 12px;
     padding: 8px 4px;
     border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: 0.15s;
+    border-radius: 6px;
+  }
+
+  .task-row:hover {
+    background: var(--bg);
   }
 
   .task-row:last-of-type {
@@ -708,7 +1305,8 @@
   }
 
   .task-cat-label {
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1;
   }
 
   .del-btn {
@@ -724,7 +1322,7 @@
   }
 
   .del-btn:hover {
-    color: #E17055;
+    color: var(--personal);
     background: var(--personal-l);
   }
 
@@ -744,6 +1342,62 @@
     font-weight: 500;
   }
 
+  /* ===== VOICE INPUT ===== */
+  .voice-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .voice-btn:hover {
+    border-color: var(--pulse);
+    color: var(--pulse);
+  }
+
+  .voice-btn.active {
+    background: var(--pulse);
+    color: #fff;
+    border-color: var(--pulse);
+    animation: pulseWave 1s infinite;
+  }
+
+  .voice-btn .label {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .voice-status {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 0;
+    min-height: 20px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .voice-status.recording {
+    color: var(--personal);
+    animation: pulseGlow 1s infinite;
+  }
+
+  .voice-hint {
+    font-size: 10px;
+    color: var(--muted);
+    opacity: 0.7;
+    text-align: center;
+    width: 100%;
+    padding: 2px 0 4px 0;
+  }
+
   /* ===== ADD FORM ===== */
   .add-form {
     display: flex;
@@ -755,15 +1409,24 @@
     align-items: center;
   }
 
-  .add-form input[type="text"] {
+  .add-form .input-wrapper {
     flex: 1 1 180px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .add-form input[type="text"] {
+    flex: 1;
     padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 13px;
     font-family: inherit;
     background: var(--bg);
+    color: var(--ink);
     transition: 0.15s;
+    min-width: 120px;
   }
 
   .add-form input[type="text"]:focus {
@@ -801,6 +1464,7 @@
     font-size: 12px;
     font-family: inherit;
     background: var(--bg);
+    color: var(--ink);
   }
 
   .add-form input[type="time"]:focus {
@@ -885,7 +1549,7 @@
   }
 
   .template-item .del-tpl:hover {
-    color: #E17055;
+    color: var(--personal);
   }
 
   .add-template-btn {
@@ -906,11 +1570,78 @@
     color: var(--pulse);
   }
 
+  /* ===== REPORT MODAL ===== */
+  .report-content {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .report-day {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .report-day:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .report-day-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+
+  .report-day-title .date {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .report-task {
+    font-size: 12px;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-secondary);
+  }
+
+  .report-task .icon {
+    font-size: 14px;
+  }
+
+  .report-task .time {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .report-empty {
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 0;
+    font-style: italic;
+  }
+
+  .report-summary {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .report-summary strong {
+    color: var(--ink);
+  }
+
   /* ===== MODALS ===== */
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(26, 22, 37, 0.5);
+    background: var(--modal-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -927,9 +1658,9 @@
     background: var(--surface);
     border-radius: 12px;
     padding: 24px;
-    max-width: 400px;
+    max-width: 480px;
     width: 100%;
-    box-shadow: 0 20px 60px rgba(26, 22, 37, 0.2);
+    box-shadow: var(--shadow-modal);
     animation: fadeInUp 0.2s ease both;
   }
 
@@ -955,6 +1686,7 @@
     font-size: 13px;
     font-family: inherit;
     background: var(--bg);
+    color: var(--ink);
     margin-bottom: 10px;
   }
 
@@ -1026,12 +1758,12 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background: var(--ink);
-    color: #fff;
+    background: var(--toast-bg);
+    color: var(--toast-text);
     padding: 10px 18px;
     border-radius: 8px;
     font-size: 13px;
-    box-shadow: 0 8px 24px rgba(26, 22, 37, 0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     opacity: 0;
     transform: translateY(8px);
     transition: 0.25s;
@@ -1049,33 +1781,27 @@
   }
 
   .toast.err {
-    background: #E17055;
+    background: var(--personal);
   }
 
   /* ===== MISC ===== */
-  .loading {
-    text-align: center;
-    color: var(--muted);
-    padding: 60px 0;
-    font-size: 14px;
-  }
-
   .setup-banner {
-    background: #FFF8EE;
-    border: 1px solid #F0D8A8;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 16px;
     font-size: 12px;
     line-height: 1.6;
-    color: #7A6A3A;
+    color: var(--muted);
   }
 
   .setup-banner code {
-    background: #F5EED6;
+    background: var(--bg);
     padding: 1px 6px;
     border-radius: 4px;
     font-size: 11px;
+    color: var(--ink);
   }
 
   /* ===== RESPONSIVE ===== */
@@ -1125,17 +1851,142 @@
       text-align: center;
       padding: 6px 12px;
     }
+
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .add-form .input-wrapper {
+      flex: 1 1 100%;
+    }
+
+    .report-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .report-btn {
+      padding: 14px 16px;
+      min-height: 50px;
+    }
+
+    .report-btn .icon {
+      font-size: 20px;
+    }
+
+    .report-btn .label {
+      font-size: 12px;
+    }
+
+    .report-btn .count-badge {
+      font-size: 14px;
+      padding: 3px 12px;
+    }
+
+    .skeleton-week {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .skeleton-week .skeleton-day {
+      height: 100px;
+    }
+
+    .loading-logo .text .name {
+      font-size: 24px;
+    }
+
+    .loading-logo .icon-wrapper {
+      width: 44px;
+      height: 44px;
+    }
+
+    .loading-logo .icon-wrapper svg {
+      width: 44px;
+      height: 44px;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+    }
+
+    .loading-spinner svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .loading-progress {
+      width: 160px;
+    }
   }
 
   @media (max-width: 420px) {
     .week-grid {
       grid-template-columns: 1fr;
     }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .skeleton-week {
+      grid-template-columns: 1fr;
+    }
+
+    .skeleton-week .skeleton-day {
+      height: 80px;
+    }
   }
 </style>
 </head>
 <body>
-<div id="app"><div class="loading">Загрузка…</div></div>
+<!-- ===== LOADING OVERLAY ===== -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="loading-container">
+    <div class="loading-logo">
+      <div class="icon-wrapper">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" stroke="var(--pulse)" stroke-width="2.5"/>
+          <path d="M20 6 L20 34 M6 20 L34 20" stroke="var(--pulse)" stroke-width="2" opacity="0.3"/>
+          <circle cx="20" cy="20" r="4" fill="var(--pulse)"/>
+          <path d="M20 12 C26 12 28 20 20 28 C12 20 14 12 20 12Z" fill="var(--pulse)" opacity="0.15"/>
+        </svg>
+      </div>
+      <div class="text">
+        <div class="name">Pulse <span>1</span>one</div>
+        <div class="sub">управление временем</div>
+      </div>
+    </div>
+
+    <div class="loading-spinner">
+      <svg viewBox="0 0 60 60">
+        <circle class="circle-bg" cx="30" cy="30" r="25"/>
+        <circle class="circle-fg" cx="30" cy="30" r="25"/>
+      </svg>
+      <div class="center-icon">⏱️</div>
+    </div>
+
+    <div class="loading-progress">
+      <div class="bar" id="loading-bar"></div>
+    </div>
+
+    <div class="loading-text">
+      <span class="dots">Загрузка</span>
+    </div>
+  </div>
+</div>
+
+<div id="app"></div>
+
 <div class="toast" id="toast"></div>
 
 <div class="overlay" id="code-overlay" hidden>
@@ -1182,6 +2033,45 @@
   </div>
 </div>
 
+<div class="overlay" id="edit-overlay" hidden>
+  <div class="modal">
+    <h3>✏️ Редактировать задачу</h3>
+    <p>Измените данные задачи</p>
+    <input type="text" id="edit-title" placeholder="Название задачи" style="text-transform:none;letter-spacing:normal;">
+    <select id="edit-cat">
+      <option value="study">📚 Учёба</option>
+      <option value="work">💼 Работа</option>
+      <option value="training">🏋️ Тренировки</option>
+      <option value="personal">🌿 Личное</option>
+    </select>
+    <div style="display:flex;gap:8px;">
+      <div class="time-field" style="flex:1;"><label for="edit-start" style="font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;display:block;margin-bottom:2px;">Начало</label><input type="time" id="edit-start" style="width:100%;"></div>
+      <div class="time-field" style="flex:1;"><label for="edit-end" style="font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;display:block;margin-bottom:2px;">Конец</label><input type="time" id="edit-end" style="width:100%;"></div>
+    </div>
+    <div style="margin:8px 0;">
+      <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="edit-done"> Выполнено
+      </label>
+    </div>
+    <div class="row">
+      <button class="cancel" id="edit-cancel">Отмена</button>
+      <button class="go" id="edit-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORT MODAL ===== -->
+<div class="overlay" id="report-overlay" hidden>
+  <div class="modal">
+    <h3 id="report-title">📋 Отчёт</h3>
+    <p id="report-subtitle">Краткая сводка планов</p>
+    <div id="report-content" class="report-content"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="cancel" id="report-close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ====== НАСТРОЙКИ БЭКЕНДА (Supabase) ====== */
 const SUPABASE_URL = 'https://rrweviidvjbhwazaowff.supabase.co';
@@ -1191,10 +2081,10 @@ const TEMPLATES_TABLE = 'templates';
 /* ============================================ */
 
 const CATEGORIES = {
-  study:    { label:'Учёба',          hex:'#6C5CE7', emoji:'📚' },
-  work:     { label:'Работа',         hex:'#F39C12', emoji:'💼' },
-  training: { label:'Тренировки',     hex:'#00B894', emoji:'🏋️' },
-  personal: { label:'Личное',         hex:'#E17055', emoji:'🌿' },
+  study:    { label:'Учёба',     hex:'#6C5CE7', emoji:'📚', icon:'📚' },
+  work:     { label:'Работа',    hex:'#F39C12', emoji:'💼', icon:'💼' },
+  training: { label:'Тренировки', hex:'#00B894', emoji:'🏋️', icon:'🏋️' },
+  personal: { label:'Личное',    hex:'#E17055', emoji:'🌿', icon:'🌿' },
 };
 const CAT_ORDER = ['study','work','training','personal'];
 const WEEKDAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -1209,9 +2099,14 @@ function sameDay(a,b){return toKey(a)===toKey(b);}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function startOfWeek(d){const dow=(d.getDay()+6)%7;return addDays(new Date(d.getFullYear(),d.getMonth(),d.getDate()),-dow);}
 function startOfMonth(d){return new Date(d.getFullYear(),d.getMonth(),1);}
+function formatDate(d){ return d.getDate() + ' ' + MONTHS_GEN[d.getMonth()]; }
+function formatFullDate(d){ return d.getDate() + ' ' + MONTHS_GEN[d.getMonth()] + ' ' + d.getFullYear(); }
+function getDayName(d){ return WEEKDAYS_FULL[(d.getDay()+6)%7]; }
 
 const CODE_KEY = 'pulse_code';
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const THEME_KEY = 'pulse_theme';
+
 function generateCode(){
   let s='';
   for(let i=0;i<6;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];
@@ -1223,6 +2118,14 @@ function getUserCode(){
   return code;
 }
 function setUserCode(code){ localStorage.setItem(CODE_KEY, code); }
+
+function getTheme(){
+  return localStorage.getItem(THEME_KEY) || 'light';
+}
+function setTheme(theme){
+  localStorage.setItem(THEME_KEY, theme);
+  document.documentElement.setAttribute('data-theme', theme);
+}
 
 function isConfigured(){
   return !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON-KEY');
@@ -1245,8 +2148,247 @@ let state = {
   templates: [],
   code: getUserCode(),
   online: isConfigured(),
+  theme: getTheme(),
+  editingId: null,
+  isRecording: false,
+  loaded: false,
 };
 
+// ===== LOADING FUNCTIONS =====
+let loadingProgress = 0;
+let loadingInterval = null;
+
+function updateLoadingProgress(target) {
+  const bar = document.getElementById('loading-bar');
+  if (!bar) return;
+  
+  const start = loadingProgress;
+  const duration = 300;
+  const startTime = Date.now();
+  
+  function animate() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = start + (target - start) * eased;
+    
+    loadingProgress = current;
+    bar.style.width = Math.min(current, 100) + '%';
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    }
+  }
+  
+  animate();
+}
+
+function showLoading(show) {
+  const overlay = document.getElementById('loading-overlay');
+  if (show) {
+    overlay.classList.remove('hidden');
+    loadingProgress = 0;
+    updateLoadingProgress(30);
+    
+    if (loadingInterval) clearInterval(loadingInterval);
+    loadingInterval = setInterval(() => {
+      if (loadingProgress < 90) {
+        const increment = 5 + Math.random() * 15;
+        updateLoadingProgress(Math.min(loadingProgress + increment, 90));
+      }
+    }, 300);
+  } else {
+    updateLoadingProgress(100);
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
+      }
+    }, 400);
+  }
+}
+
+// ===== VOICE RECOGNITION =====
+let recognition = null;
+let recognitionSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+
+function initSpeechRecognition() {
+  if (!recognitionSupported) return null;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SpeechRecognition();
+  rec.lang = 'ru-RU';
+  rec.continuous = false;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  return rec;
+}
+
+function startVoiceInput() {
+  if (!recognitionSupported) {
+    showToast('Голосовой ввод не поддерживается в этом браузере', true);
+    return;
+  }
+  if (state.isRecording) {
+    stopVoiceInput();
+    return;
+  }
+  try {
+    recognition = initSpeechRecognition();
+    if (!recognition) {
+      showToast('Ошибка инициализации голосового ввода', true);
+      return;
+    }
+    const titleInput = document.getElementById('new-title');
+    if (!titleInput) return;
+    state.isRecording = true;
+    const voiceBtn = document.querySelector('.voice-btn');
+    const voiceStatus = document.querySelector('.voice-status');
+    if (voiceBtn) voiceBtn.classList.add('active');
+    if (voiceStatus) {
+      voiceStatus.textContent = '🎤 Слушаю...';
+      voiceStatus.classList.add('recording');
+    }
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      const text = finalTranscript || interimTranscript;
+      if (text && titleInput) {
+        titleInput.value = text.trim();
+        titleInput.dispatchEvent(new Event('input'));
+      }
+    };
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      if (event.error === 'not-allowed') {
+        showToast('Доступ к микрофону запрещён', true);
+      } else if (event.error !== 'aborted') {
+        showToast('Ошибка распознавания: ' + event.error, true);
+      }
+      stopVoiceInput();
+    };
+    recognition.onend = () => {
+      stopVoiceInput();
+    };
+    recognition.start();
+  } catch (error) {
+    console.error('Speech recognition error:', error);
+    showToast('Ошибка запуска голосового ввода', true);
+    stopVoiceInput();
+  }
+}
+
+function stopVoiceInput() {
+  state.isRecording = false;
+  if (recognition) {
+    try { recognition.stop(); } catch (e) {}
+    recognition = null;
+  }
+  const voiceBtn = document.querySelector('.voice-btn');
+  const voiceStatus = document.querySelector('.voice-status');
+  if (voiceBtn) voiceBtn.classList.remove('active');
+  if (voiceStatus) {
+    voiceStatus.textContent = '🎤 Нажмите для голосового ввода';
+    voiceStatus.classList.remove('recording');
+  }
+}
+
+// ===== REPORT FUNCTIONS =====
+function getReportData(days, label){
+  const today = new Date();
+  const dates = [];
+  let reportTitle = label;
+  
+  if(days === 'tomorrow'){
+    const d = addDays(today, 1);
+    dates.push(d);
+    reportTitle = '📋 Планы на завтра';
+  } else if(days === 'dayAfter'){
+    const d = addDays(today, 2);
+    dates.push(d);
+    reportTitle = '📋 Планы на послезавтра';
+  } else if(days === 'nextWeek'){
+    const start = addDays(today, 7);
+    for(let i = 0; i < 7; i++){
+      dates.push(addDays(start, i));
+    }
+    reportTitle = '📋 Планы на следующую неделю';
+  }
+  
+  const report = dates.map(d => {
+    const key = toKey(d);
+    const evs = sortByStart(eventsOn(key));
+    return {
+      date: d,
+      key: key,
+      events: evs,
+      count: evs.length,
+      done: evs.filter(e => e.done).length
+    };
+  });
+  
+  const total = report.reduce((sum, r) => sum + r.count, 0);
+  const doneTotal = report.reduce((sum, r) => sum + r.done, 0);
+  
+  return { report, total, doneTotal, title: reportTitle };
+}
+
+function showReport(days, label){
+  const data = getReportData(days, label);
+  const { report, total, doneTotal, title } = data;
+  
+  const overlay = document.getElementById('report-overlay');
+  document.getElementById('report-title').textContent = title;
+  document.getElementById('report-subtitle').textContent = `Всего задач: ${total} | Выполнено: ${doneTotal}`;
+  
+  let contentHTML = '';
+  
+  report.forEach(r => {
+    const dayName = getDayName(r.date);
+    const dateStr = formatFullDate(r.date);
+    contentHTML += `<div class="report-day">
+      <div class="report-day-title">${dayName} <span class="date">${dateStr}</span> <span style="font-size:12px;color:var(--muted);">(${r.count} задач${r.count > 0 ? ', выполнено ' + r.done : ''})</span></div>`;
+    
+    if(r.events.length === 0){
+      contentHTML += `<div class="report-empty">😌 Нет запланированных задач</div>`;
+    } else {
+      r.events.forEach(e => {
+        const isDone = e.done ? '✅' : '⏳';
+        contentHTML += `<div class="report-task">
+          <span class="icon">${CATEGORIES[e.category].icon}</span>
+          <span>${escapeHTML(e.title)}</span>
+          <span class="time">${timeLabel(e)}</span>
+          <span style="font-size:11px;color:var(--muted);">${isDone}</span>
+        </div>`;
+      });
+    }
+    
+    contentHTML += `</div>`;
+  });
+  
+  if(total === 0){
+    contentHTML = `<div class="report-empty" style="text-align:center;padding:20px 0;font-size:14px;">🎯 Нет запланированных задач на выбранный период</div>`;
+  }
+  
+  contentHTML += `<div class="report-summary">
+    📊 <strong>Итого:</strong> ${total} задач, из них выполнено <strong>${doneTotal}</strong> (${total > 0 ? Math.round(doneTotal/total*100) : 0}%)
+    ${total > 0 && doneTotal === total ? ' 🎉 Все задачи выполнены!' : ''}
+    ${total > 0 && doneTotal === 0 ? ' 💪 Всё впереди!' : ''}
+  </div>`;
+  
+  document.getElementById('report-content').innerHTML = contentHTML;
+  overlay.hidden = false;
+}
+
+// ===== TOAST =====
 function showToast(msg, isErr){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1256,6 +2398,7 @@ function showToast(msg, isErr){
   showToast._t = setTimeout(()=>t.classList.remove('show'), 2400);
 }
 
+// ===== API FUNCTIONS =====
 async function fetchEvents(){
   if(!state.online) return [];
   try{
@@ -1305,7 +2448,7 @@ async function patchEvent(id, patch){
   try{
     const res = await sbFetch(`/rest/v1/${TABLE}?id=eq.${id}`, { method:'PATCH', body: JSON.stringify(patch) });
     if(!res.ok) throw new Error('patch failed');
-    showToast('Сохранено ✓');
+    showToast('Обновлено ✓');
   }catch(e){
     showToast('Не удалось обновить дело', true);
   }
@@ -1373,6 +2516,10 @@ function renderRibbonHTML(counts,total,height){
     }
   });
   return html + `</div>`;
+}
+
+function getCategoryIcon(category){
+  return CATEGORIES[category]?.icon || '📌';
 }
 
 function formatRangeLabel(){
@@ -1443,17 +2590,245 @@ async function applyAllTemplates(){
   }
 }
 
+function renderStats(){
+  const today = new Date();
+  const weekStart = startOfWeek(today);
+  const weekEnd = addDays(weekStart, 6);
+  const weekEvents = eventsInRange(weekStart, weekEnd);
+  
+  const total = weekEvents.length;
+  const done = weekEvents.filter(e => e.done).length;
+  const donePercent = total > 0 ? Math.round((done / total) * 100) : 0;
+  
+  const categoryCounts = {study:0, work:0, training:0, personal:0};
+  weekEvents.forEach(e => {
+    if(categoryCounts[e.category] !== undefined) categoryCounts[e.category]++;
+  });
+  
+  const maxCategory = Math.max(...Object.values(categoryCounts), 1);
+  
+  let statsHTML = `
+    <div class="stats-grid">
+      <div class="stats-card">
+        <div class="stats-label">📊 Всего задач</div>
+        <div class="stats-value">${total}</div>
+        <div class="stats-sub">за эту неделю</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-label">✅ Выполнено</div>
+        <div class="stats-value">${done}</div>
+        <div class="stats-sub">${donePercent}% от всех задач</div>
+        <div class="stats-bar"><div class="fill" style="width:${donePercent}%;background:var(--training);"></div></div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-label">⏳ Осталось</div>
+        <div class="stats-value">${total - done}</div>
+        <div class="stats-sub">требуют внимания</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-label">📈 Продуктивность</div>
+        <div class="stats-value">${donePercent}%</div>
+        <div class="stats-sub">${donePercent >= 70 ? '🌟 Отлично!' : donePercent >= 40 ? '👍 Хорошо' : '💪 Работаем над этим'}</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+  `;
+  
+  CAT_ORDER.forEach(k => {
+    const count = categoryCounts[k] || 0;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    const width = total > 0 ? Math.round((count / maxCategory) * 100) : 0;
+    statsHTML += `
+      <div class="stats-card">
+        <div class="stats-label">${CATEGORIES[k].icon} ${CATEGORIES[k].label}</div>
+        <div class="stats-value">${count}</div>
+        <div class="stats-sub">${pct}% от всех задач</div>
+        <div class="stats-bar"><div class="fill" style="width:${width}%;background:${CATEGORIES[k].hex};"></div></div>
+      </div>
+    `;
+  });
+  
+  statsHTML += `</div>`;
+  return statsHTML;
+}
+
+// ===== EDIT FUNCTIONS =====
+function openEditModal(id){
+  const ev = state.events.find(e => e.id === id);
+  if(!ev) return;
+  state.editingId = id;
+  document.getElementById('edit-title').value = ev.title;
+  document.getElementById('edit-cat').value = ev.category;
+  document.getElementById('edit-start').value = ev.start || '';
+  document.getElementById('edit-end').value = ev.end || '';
+  document.getElementById('edit-done').checked = ev.done || false;
+  document.getElementById('edit-overlay').hidden = false;
+}
+
+function closeEditModal(){
+  document.getElementById('edit-overlay').hidden = true;
+  state.editingId = null;
+}
+
+async function saveEdit(){
+  const id = state.editingId;
+  if(!id) return;
+  const title = document.getElementById('edit-title').value.trim();
+  const category = document.getElementById('edit-cat').value;
+  const start = document.getElementById('edit-start').value;
+  const end = document.getElementById('edit-end').value;
+  const done = document.getElementById('edit-done').checked;
+  if(!title || !start){
+    showToast('Заполните название и время', true);
+    return;
+  }
+  closeEditModal();
+  const patch = { title, category, start_time: start, end_time: end || null, done };
+  await patchEvent(id, patch);
+  const ev = state.events.find(e => e.id === id);
+  if(ev){
+    ev.title = title;
+    ev.category = category;
+    ev.start = start;
+    ev.end = end || null;
+    ev.done = done;
+  }
+  render();
+}
+
+// ===== GLOBAL EVENT DELEGATION =====
+function setupEventDelegation() {
+  const app = document.getElementById('app');
+  
+  // View toggle (Неделя/Месяц)
+  app.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-view]');
+    if (btn) {
+      state.view = btn.dataset.view;
+      render();
+      e.preventDefault();
+    }
+  });
+
+  // Navigation (вперёд/назад/сегодня)
+  app.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-nav]');
+    if (btn) {
+      const n = btn.dataset.nav;
+      if (n === 'today') { 
+        state.anchor = new Date(); 
+        state.selected = new Date(); 
+      } else {
+        const delta = parseInt(n, 10);
+        if (state.view === 'month') {
+          state.anchor = new Date(state.anchor.getFullYear(), state.anchor.getMonth() + delta, 1);
+        } else {
+          state.anchor = addDays(state.anchor, delta * 7);
+        }
+      }
+      render();
+      e.preventDefault();
+    }
+  });
+
+  // Date selection (клик по дню в календаре)
+  app.addEventListener('click', function(e) {
+    const el = e.target.closest('[data-date]');
+    if (el) {
+      state.selected = parseKey(el.dataset.date);
+      render();
+      e.preventDefault();
+    }
+  });
+
+  // Delete event
+  app.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-del]');
+    if (btn) {
+      e.stopPropagation();
+      const id = btn.dataset.del;
+      state.events = state.events.filter(e => e.id !== id);
+      render();
+      deleteEventRemote(id);
+      e.preventDefault();
+    }
+  });
+
+  // Delete template
+  app.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-tpl-del]');
+    if (btn) {
+      const id = btn.dataset.tplDel;
+      state.templates = state.templates.filter(t => t.id !== id);
+      render();
+      deleteTemplateRemote(id);
+      e.preventDefault();
+    }
+  });
+
+  // Edit task - click on task row
+  app.addEventListener('click', function(e) {
+    const row = e.target.closest('.task-row[data-id]');
+    if (row) {
+      if (e.target.closest('input[type="checkbox"]') || e.target.closest('.del-btn')) return;
+      const id = row.dataset.id;
+      openEditModal(id);
+      e.preventDefault();
+    }
+  });
+
+  // Edit task - click on chip
+  app.addEventListener('click', function(e) {
+    const chip = e.target.closest('.chip[data-id]');
+    if (chip) {
+      const id = chip.dataset.id;
+      openEditModal(id);
+      e.preventDefault();
+    }
+  });
+
+  // Toggle done (чекбоксы)
+  app.addEventListener('change', function(e) {
+    const cb = e.target.closest('[data-toggle]');
+    if (cb) {
+      const ev = state.events.find(e => e.id === cb.dataset.toggle);
+      if (!ev) return;
+      ev.done = !ev.done;
+      patchEvent(ev.id, {done: ev.done});
+      setTimeout(render, 300);
+      e.preventDefault();
+    }
+  });
+
+  // Report buttons
+  app.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-report]');
+    if (btn) {
+      const type = btn.dataset.report;
+      const labels = {
+        'tomorrow': 'Завтра',
+        'dayAfter': 'Послезавтра',
+        'nextWeek': 'Следующая неделя'
+      };
+      showReport(type, labels[type]);
+      e.preventDefault();
+    }
+  });
+}
+
 function render(){
   const app = document.getElementById('app');
   const today = new Date();
 
-  // Данные для дня
+  setTheme(state.theme);
+
+  const statsHTML = renderStats();
+
   const selKey = toKey(state.selected);
   const dayEvs = sortByStart(eventsOn(selKey));
 
-  // Блок расписания на день
   const scheduleHTML = `
-    <div class="day-schedule">
+    <div class="day-schedule fade-in fade-in-d1">
       <div class="day-schedule-header">
         <h3>📋 Расписание на день</h3>
         <span class="date">${fullDayLabel(state.selected)}</span>
@@ -1462,7 +2837,7 @@ function render(){
         ${dayEvs.length ? dayEvs.map(e => `
           <div class="time">${timeLabel(e)}</div>
           <div class="task ${e.done?'done':''}">
-            <span class="dot" style="background:${CATEGORIES[e.category].hex}"></span>
+            <span class="task-icon">${getCategoryIcon(e.category)}</span>
             ${escapeHTML(e.title)}
             ${e.is_template ? '<span style="font-size:9px;color:var(--muted);margin-left:4px;">🔄</span>' : ''}
           </div>
@@ -1474,32 +2849,44 @@ function render(){
     </div>
   `;
 
-  // Блок задач на день (бывший panel)
   const tasksHTML = dayEvs.length ? dayEvs.map(e=>{
     const isTemplate = e.is_template;
-    return `<div class="task-row" data-row="${e.id}">
+    return `<div class="task-row" data-id="${e.id}">
       <input type="checkbox" ${e.done?'checked':''} data-toggle="${e.id}">
       <span class="task-cat" style="background:${CATEGORIES[e.category].hex}"></span>
       <span class="task-title ${e.done?'done':''}">${isTemplate?'🔄 ':''}${escapeHTML(e.title)}${isTemplate?' <span class="template-badge">шаблон</span>':''}</span>
       <span class="task-time">${timeLabel(e)}</span>
-      <span class="task-cat-label">${CATEGORIES[e.category].emoji}</span>
+      <span class="task-cat-label">${getCategoryIcon(e.category)}</span>
       <button class="del-btn" data-del="${e.id}" aria-label="Удалить">×</button>
     </div>`;
   }).join('') : `<div class="empty-day">Нет задач на этот день</div>`;
 
+  const voiceStatusText = state.isRecording ? '🎤 Слушаю...' : '🎤 Нажмите для голосового ввода';
+
   const taskPanelHTML = `
-    <div class="task-panel">
+    <div class="task-panel fade-in fade-in-d2">
       <h2>📌 Задачи на день</h2>
+      <div style="margin-bottom:8px;font-size:11px;color:var(--muted);">
+        💡 Кликните по задаче для редактирования
+      </div>
       ${tasksHTML}
       <form class="add-form" id="add-form">
-        <input type="text" id="new-title" placeholder="Новая задача" required maxlength="120">
+        <div class="input-wrapper">
+          <input type="text" id="new-title" placeholder="Новая задача" required maxlength="120">
+          <button type="button" class="voice-btn ${state.isRecording ? 'active' : ''}" id="voice-btn" title="Голосовой ввод">
+            🎤
+            <span class="label">${state.isRecording ? 'Стоп' : 'Голос'}</span>
+          </button>
+        </div>
+        <div class="voice-status ${state.isRecording ? 'recording' : ''}" id="voice-status">${voiceStatusText}</div>
+        <div class="voice-hint">Нажмите на кнопку с микрофоном и продиктуйте задачу голосом</div>
         <select id="new-cat">
-          ${CAT_ORDER.map(k=>`<option value="${k}">${CATEGORIES[k].emoji} ${CATEGORIES[k].label}</option>`).join('')}
+          ${CAT_ORDER.map(k=>`<option value="${k}">${CATEGORIES[k].icon} ${CATEGORIES[k].label}</option>`).join('')}
         </select>
         <div class="time-field"><label for="new-start">с</label><input type="time" id="new-start" required></div>
         <div class="time-field"><label for="new-end">по</label><input type="time" id="new-end"></div>
         <button type="submit" ${state.online?'':'disabled'}>Добавить</button>
-        <div class="hint">Конец необязателен</div>
+        <div class="hint">🎤 Используйте голос для быстрого ввода задач</div>
       </form>
       
       <div class="templates-section">
@@ -1509,7 +2896,7 @@ function render(){
           return `<div class="template-item">
             <span>🔄 ${escapeHTML(tpl.title)}</span>
             <span class="days">${dayNames} ${tpl.start}${tpl.end?'–'+tpl.end:''}</span>
-            <span>${CATEGORIES[tpl.category].emoji}</span>
+            <span>${CATEGORIES[tpl.category].icon}</span>
             <button class="del-tpl" data-tpl-del="${tpl.id}">×</button>
           </div>`;
         }).join('') : '<div style="color:var(--muted);font-size:12px;padding:4px 0;">Нет регулярных задач</div>'}
@@ -1518,7 +2905,6 @@ function render(){
     </div>
   `;
 
-  // Баланс
   let rangeStart, rangeEnd, balanceTitle;
   if(state.view==='month'){
     rangeStart = startOfMonth(state.anchor);
@@ -1537,18 +2923,17 @@ function render(){
     legendHTML = `<div class="legend">` + CAT_ORDER.map(k=>{
       if(counts[k]===0) return '';
       const pct = Math.round(counts[k]/total*100);
-      return `<div class="item"><span class="dot" style="background:${CATEGORIES[k].hex}"></span>${CATEGORIES[k].emoji} ${CATEGORIES[k].label} <span class="pct">${pct}%</span></div>`;
+      return `<div class="item"><span class="cat-icon">${CATEGORIES[k].icon}</span><span class="dot" style="background:${CATEGORIES[k].hex}"></span>${CATEGORIES[k].label} <span class="pct">${pct}%</span></div>`;
     }).join('') + `</div>`;
   }
 
   const balanceHTML = `
-    <div class="balance-card">
+    <div class="balance-card fade-in fade-in-d3">
       <div class="btitle">${balanceTitle}</div>
       ${renderRibbonHTML(counts,total,8)}
       ${total>0 ? legendHTML : `<div class="empty-note">Нет запланированных дел на этот период</div>`}
     </div>`;
 
-  // Календарь
   let calendarHTML = '';
   if(state.view==='month'){
     const first = startOfMonth(state.anchor);
@@ -1581,9 +2966,9 @@ function render(){
       const shown = evs.slice(0,4);
       const chips = shown.map(e => {
         const isTemplate = e.is_template;
-        return `<div class="chip ${e.done?'done':''} ${isTemplate?'chip-template':''}">
+        return `<div class="chip ${e.done?'done':''} ${isTemplate?'chip-template':''}" data-id="${e.id}">
           ${isTemplate?'<span class="chip-template-icon">🔄</span>':''}
-          <span class="sq" style="background:${CATEGORIES[e.category].hex}"></span>
+          <span class="chip-icon">${getCategoryIcon(e.category)}</span>
           ${timeLabel(e)} · ${escapeHTML(e.title)}
         </div>`;
       }).join('');
@@ -1602,17 +2987,29 @@ function render(){
     </div>`;
 
   const statusDot = state.online ? 'online' : 'offline';
+  const isDark = state.theme === 'dark';
+
+  // Count tasks for tomorrow, day after, next week
+  const tomorrow = addDays(today, 1);
+  const dayAfter = addDays(today, 2);
+  const nextWeekStart = addDays(today, 7);
+  const tomorrowCount = eventsOn(toKey(tomorrow)).length;
+  const dayAfterCount = eventsOn(toKey(dayAfter)).length;
+  let nextWeekCount = 0;
+  for(let i = 0; i < 7; i++){
+    nextWeekCount += eventsOn(toKey(addDays(nextWeekStart, i))).length;
+  }
 
   app.innerHTML = `
-    <div class="topbar">
+    <div class="topbar fade-in fade-in-d1">
       <div class="flex-between">
         <div class="logo">
           <div class="logo-icon">
             <svg viewBox="0 0 40 40" fill="none">
-              <circle cx="20" cy="20" r="18" stroke="#6C5CE7" stroke-width="2.5"/>
-              <path d="M20 6 L20 34 M6 20 L34 20" stroke="#6C5CE7" stroke-width="2" opacity="0.3"/>
-              <circle cx="20" cy="20" r="4" fill="#6C5CE7"/>
-              <path d="M20 12 C26 12 28 20 20 28 C12 20 14 12 20 12Z" fill="#6C5CE7" opacity="0.15"/>
+              <circle cx="20" cy="20" r="18" stroke="${state.theme === 'dark' ? '#7C6CFF' : '#6C5CE7'}" stroke-width="2.5"/>
+              <path d="M20 6 L20 34 M6 20 L34 20" stroke="${state.theme === 'dark' ? '#7C6CFF' : '#6C5CE7'}" stroke-width="2" opacity="0.3"/>
+              <circle cx="20" cy="20" r="4" fill="${state.theme === 'dark' ? '#7C6CFF' : '#6C5CE7'}"/>
+              <path d="M20 12 C26 12 28 20 20 28 C12 20 14 12 20 12Z" fill="${state.theme === 'dark' ? '#7C6CFF' : '#6C5CE7'}" opacity="0.15"/>
             </svg>
           </div>
           <div class="logo-text">
@@ -1622,6 +3019,12 @@ function render(){
         </div>
         <div class="flex" style="gap:8px;">
           <span class="status ${statusDot}" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${state.online?'#00B894':'#E17055'};"></span>
+          <div class="theme-toggle" id="theme-toggle">
+            <span class="icon">${isDark ? '🌙' : '☀️'}</span>
+            <div class="switch ${isDark ? 'active' : ''}">
+              <div class="dot"></div>
+            </div>
+          </div>
           <div class="viewtoggle">
             <button data-view="week" class="${state.view==='week'?'active':''}">Неделя</button>
             <button data-view="month" class="${state.view==='month'?'active':''}">Месяц</button>
@@ -1630,14 +3033,14 @@ function render(){
       </div>
     </div>
     ${setupBanner}
-    <div class="code-bar">
+    <div class="code-bar fade-in fade-in-d2">
       <span class="lbl">Код доступа</span>
       <span class="code-pill">${state.code}</span>
       <button id="copy-code">Копировать</button>
       <span class="spacer"></span>
       <button id="switch-code">Сменить код</button>
     </div>
-    <div class="nav">
+    <div class="nav fade-in fade-in-d3">
       <button data-nav="-1">‹</button>
       <div class="label">${formatRangeLabel()}</div>
       <button data-nav="1">›</button>
@@ -1645,96 +3048,155 @@ function render(){
     </div>
     ${scheduleHTML}
     ${taskPanelHTML}
+    ${statsHTML}
     ${balanceHTML}
+    
+    <!-- REPORT SECTION -->
+    <div class="report-section fade-in fade-in-d6">
+      <div class="report-section-title">📊 Быстрые отчёты</div>
+      <div class="report-grid">
+        <button class="report-btn" data-report="tomorrow">
+          <div class="left">
+            <span class="icon">📅</span>
+            <div class="info">
+              <span class="label">Завтра</span>
+              <span class="sub">${formatDate(tomorrow)}</span>
+            </div>
+          </div>
+          <span class="count-badge ${tomorrowCount === 0 ? 'empty' : ''}">${tomorrowCount > 0 ? tomorrowCount : '—'}</span>
+        </button>
+        <button class="report-btn" data-report="dayAfter">
+          <div class="left">
+            <span class="icon">📅</span>
+            <div class="info">
+              <span class="label">Послезавтра</span>
+              <span class="sub">${formatDate(dayAfter)}</span>
+            </div>
+          </div>
+          <span class="count-badge ${dayAfterCount === 0 ? 'empty' : ''}">${dayAfterCount > 0 ? dayAfterCount : '—'}</span>
+        </button>
+        <button class="report-btn" data-report="nextWeek">
+          <div class="left">
+            <span class="icon">📅</span>
+            <div class="info">
+              <span class="label">Следующая неделя</span>
+              <span class="sub">7 дней</span>
+            </div>
+          </div>
+          <span class="count-badge ${nextWeekCount === 0 ? 'empty' : ''}">${nextWeekCount > 0 ? nextWeekCount : '—'}</span>
+        </button>
+      </div>
+    </div>
+    
     ${calendarHTML}
   `;
 
-  attachHandlers();
+  // Hide loading overlay
+  showLoading(false);
+  state.loaded = true;
+
+  // Set up event delegation (only once)
+  if (!window._delegationSet) {
+    setupEventDelegation();
+    window._delegationSet = true;
+  }
+
+  attachDirectHandlers();
 }
 
-function attachHandlers(){
-  document.querySelectorAll('[data-view]').forEach(btn=>{
-    btn.onclick = ()=>{ state.view = btn.dataset.view; render(); };
-  });
-  document.querySelectorAll('[data-nav]').forEach(btn=>{
-    btn.onclick = ()=>{
-      const n = btn.dataset.nav;
-      if(n==='today'){ state.anchor = new Date(); state.selected = new Date(); }
-      else{
-        const delta = parseInt(n,10);
-        if(state.view==='month') state.anchor = new Date(state.anchor.getFullYear(), state.anchor.getMonth()+delta, 1);
-        else state.anchor = addDays(state.anchor, delta*7);
-      }
+function attachDirectHandlers() {
+  // Theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.onclick = () => {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
       render();
     };
-  });
-  document.querySelectorAll('[data-date]').forEach(el=>{
-    el.onclick = ()=>{ state.selected = parseKey(el.dataset.date); render(); };
-  });
-  document.querySelectorAll('[data-toggle]').forEach(el=>{
-    el.onchange = async ()=>{
-      const ev = state.events.find(e=>e.id===el.dataset.toggle);
-      if(!ev) return;
-      ev.done = !ev.done;
-      await patchEvent(ev.id, {done: ev.done});
-      setTimeout(render, 300);
-    };
-  });
-  document.querySelectorAll('[data-del]').forEach(el=>{
-    el.onclick = async ()=>{
-      const id = el.dataset.del;
-      state.events = state.events.filter(e=>e.id!==id);
-      render();
-      await deleteEventRemote(id);
-    };
-  });
-  document.querySelectorAll('[data-tpl-del]').forEach(el=>{
-    el.onclick = async ()=>{
-      const id = el.dataset.tplDel;
-      state.templates = state.templates.filter(t=>t.id!==id);
-      render();
-      await deleteTemplateRemote(id);
-    };
-  });
-  
+  }
+
+  // Voice button
+  const voiceBtn = document.getElementById('voice-btn');
+  if (voiceBtn) {
+    voiceBtn.onclick = startVoiceInput;
+  }
+
+  // Report close
+  document.getElementById('report-close').onclick = () => {
+    document.getElementById('report-overlay').hidden = true;
+  };
+  document.getElementById('report-overlay').onclick = (e) => {
+    if (e.target === e.currentTarget) {
+      document.getElementById('report-overlay').hidden = true;
+    }
+  };
+
+  // Edit modal
+  document.getElementById('edit-cancel').onclick = closeEditModal;
+  document.getElementById('edit-save').onclick = saveEdit;
+  document.getElementById('edit-overlay').onclick = (e) => {
+    if (e.target === e.currentTarget) closeEditModal();
+  };
+  document.getElementById('edit-title').onkeydown = (e) => {
+    if (e.key === 'Enter') saveEdit();
+  };
+
+  // Add form
   const form = document.getElementById('add-form');
-  if(form){
-    form.onsubmit = async (ev)=>{
+  if (form) {
+    form.onsubmit = async (ev) => {
       ev.preventDefault();
+      if (state.isRecording) stopVoiceInput();
       const title = document.getElementById('new-title').value.trim();
       const start = document.getElementById('new-start').value;
       let end = document.getElementById('new-end').value;
-      if(!title || !start) return;
-      if(end && end <= start) end = '';
+      if (!title || !start) return;
+      if (end && end <= start) end = '';
       const cat = document.getElementById('new-cat').value;
-      const payload = { date: toKey(state.selected), start, end: end||null, title, category: cat, is_template: false };
+      const payload = { date: toKey(state.selected), start, end: end || null, title, category: cat, is_template: false };
       const created = await insertEvent(payload);
-      if(created){
-        state.events.push({ id:created.id, date:created.date, start:created.start_time, end:created.end_time, title:created.title, category:created.category, done:false, is_template:false });
+      if (created) {
+        state.events.push({
+          id: created.id,
+          date: created.date,
+          start: created.start_time,
+          end: created.end_time,
+          title: created.title,
+          category: created.category,
+          done: false,
+          is_template: false
+        });
         render();
       }
     };
   }
-  
+
+  // Copy code
   const copyBtn = document.getElementById('copy-code');
-  if(copyBtn){
-    copyBtn.onclick = async ()=>{
-      try{ await navigator.clipboard.writeText(state.code); showToast('Код скопирован'); }
-      catch(e){ showToast('Не удалось скопировать', true); }
+  if (copyBtn) {
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(state.code);
+        showToast('Код скопирован');
+      } catch (e) {
+        showToast('Не удалось скопировать', true);
+      }
     };
   }
+
+  // Switch code
   const switchBtn = document.getElementById('switch-code');
-  if(switchBtn){
-    switchBtn.onclick = ()=>{
+  if (switchBtn) {
+    switchBtn.onclick = () => {
       document.getElementById('code-overlay').hidden = false;
       document.getElementById('code-input').value = '';
       document.getElementById('code-input').focus();
     };
   }
-  
+
+  // Add template
   const addTemplateBtn = document.getElementById('add-template-btn');
-  if(addTemplateBtn){
-    addTemplateBtn.onclick = ()=>{
+  if (addTemplateBtn) {
+    addTemplateBtn.onclick = () => {
       document.getElementById('template-overlay').hidden = false;
       document.getElementById('tpl-title').value = '';
       document.getElementById('tpl-start').value = '20:00';
@@ -1745,6 +3207,7 @@ function attachHandlers(){
   }
 }
 
+// ===== OVERLAY HANDLERS =====
 const overlay = document.getElementById('code-overlay');
 document.getElementById('code-cancel').onclick = ()=>{ overlay.hidden = true; };
 document.getElementById('code-go').onclick = async ()=>{
@@ -1753,7 +3216,7 @@ document.getElementById('code-go').onclick = async ()=>{
   overlay.hidden = true;
   setUserCode(val);
   state.code = val;
-  document.getElementById('app').innerHTML = '<div class="loading">Загрузка…</div>';
+  showLoading(true);
   state.events = await fetchEvents();
   state.templates = await fetchTemplates();
   render();
@@ -1773,7 +3236,6 @@ document.getElementById('tpl-save').onclick = async ()=>{
   }
   const days = Array.from(checkboxes).map(cb => cb.value).join(',');
   tplOverlay.hidden = true;
-  
   const payload = { title, start, end: end||null, category: cat, days };
   const created = await insertTemplate(payload);
   if(created){
@@ -1790,15 +3252,28 @@ document.querySelectorAll('#tpl-days label').forEach(label => {
   };
 });
 
+// ===== INIT =====
 (async function init(){
-  if(!state.online){
-    render();
-    return;
+  // Show loading
+  showLoading(true);
+  
+  // Set theme
+  setTheme(state.theme);
+  
+  // Load data
+  if(state.online){
+    state.events = await fetchEvents();
+    state.templates = await fetchTemplates();
+    await applyAllTemplates();
   }
-  state.events = await fetchEvents();
-  state.templates = await fetchTemplates();
-  await applyAllTemplates();
+  
+  // Render content
   render();
+  
+  // Ensure loading overlay is hidden after everything
+  setTimeout(() => {
+    showLoading(false);
+  }, 500);
 })();
 </script>
 </body>
